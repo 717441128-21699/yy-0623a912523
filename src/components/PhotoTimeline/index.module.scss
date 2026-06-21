@@ -1,0 +1,141 @@
+@use '@/styles/variables.scss' as *;
+
+.timeline {
+  padding: 0 $page-padding;
+}
+
+.item {
+  display: flex;
+  padding-bottom: $spacing-lg;
+}
+
+.lineWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 40rpx;
+  flex-shrink: 0;
+  margin-right: $spacing-md;
+}
+
+.dot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  flex-shrink: 0;
+  margin-top: 8rpx;
+}
+
+.line {
+  width: 2rpx;
+  flex: 1;
+  background: $color-border;
+  margin-top: $spacing-xs;
+}
+
+.card {
+  flex: 1;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.cardHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.date {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-right: $spacing-sm;
+}
+
+.angle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-right: $spacing-sm;
+}
+
+.privateTag {
+  background: rgba(155, 139, 152, 0.12);
+  padding: 2rpx 12rpx;
+  border-radius: $radius-round;
+}
+
+.privateTagText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  white-space: nowrap;
+}
+
+.photoWrap {
+  position: relative;
+  border-radius: $radius-md;
+  overflow: hidden;
+  margin-bottom: $spacing-sm;
+}
+
+.photo {
+  width: 100%;
+  height: 360rpx;
+}
+
+.annotationBadge {
+  position: absolute;
+  bottom: $spacing-sm;
+  right: $spacing-sm;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4rpx 12rpx;
+  border-radius: $radius-round;
+}
+
+.annotationBadgeText {
+  font-size: $font-size-xs;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.notes {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+  @include text-ellipsis-multi(2);
+}
+
+.feelingWrap {
+  display: flex;
+  align-items: center;
+}
+
+.feelingLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-right: $spacing-sm;
+}
+
+.feelingDots {
+  display: flex;
+  gap: 8rpx;
+}
+
+.feelingDot {
+  width: 16rpx;
+  height: 16rpx;
+  border-radius: $radius-round;
+  background: $color-border;
+
+  &Active {
+    background: $color-primary;
+  }
+}

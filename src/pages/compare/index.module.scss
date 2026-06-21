@@ -1,0 +1,166 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, $color-bg-gradient-start 0%, $color-bg-page 30%);
+  padding-bottom: 120rpx;
+}
+
+.header {
+  padding: $spacing-lg $page-padding $spacing-md;
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.treatmentFilter {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.treatmentScroll {
+  @include scroll-x-container;
+  padding-bottom: $spacing-sm;
+}
+
+.treatmentTab {
+  @include scroll-x-item(auto);
+  padding: 8rpx 24rpx;
+  border-radius: $radius-round;
+  background: $color-bg-card;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.05);
+  margin-right: $spacing-sm;
+  transition: all $transition-base;
+
+  &.active {
+    background: $color-primary;
+    box-shadow: none;
+  }
+}
+
+.treatmentTabText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+
+  .active & {
+    color: #ffffff;
+  }
+}
+
+.compareSection {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.compareHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.compareTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.compareHint {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.summaryCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.summaryTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.summaryItem {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+
+  & + & {
+    margin-top: $spacing-xs;
+  }
+}
+
+.summaryDot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.summaryText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex: 1;
+}
+
+.timelineSection {
+  padding: 0 $page-padding;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.shareBtn {
+  padding: 8rpx 24rpx;
+  border-radius: $radius-round;
+  background: rgba(212, 160, 184, 0.12);
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.8;
+  }
+}
+
+.shareBtnText {
+  font-size: $font-size-sm;
+  color: $color-primary-dark;
+  white-space: nowrap;
+}
+
+.emptyWrap {
+  @include flex-center;
+  flex-direction: column;
+  padding: 120rpx 0;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}

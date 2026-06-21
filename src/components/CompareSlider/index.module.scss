@@ -1,0 +1,151 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: $shadow-card;
+}
+
+.imageWrap {
+  position: relative;
+  width: 100%;
+  height: 500rpx;
+  overflow: hidden;
+}
+
+.afterImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.beforeClip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  overflow: hidden;
+  z-index: 2;
+}
+
+.beforeImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 686rpx;
+  height: 100%;
+}
+
+.slider {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform: translateX(-50%);
+  cursor: pointer;
+}
+
+.sliderActive {
+  .sliderHandle {
+    transform: scale(1.1);
+  }
+}
+
+.sliderLine {
+  flex: 1;
+  width: 2rpx;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.sliderHandle {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: $radius-round;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4rpx;
+  transition: transform $transition-fast;
+}
+
+.sliderArrowLeft {
+  width: 0;
+  height: 0;
+  border-top: 8rpx solid transparent;
+  border-bottom: 8rpx solid transparent;
+  border-right: 10rpx solid $color-primary;
+}
+
+.sliderArrowRight {
+  width: 0;
+  height: 0;
+  border-top: 8rpx solid transparent;
+  border-bottom: 8rpx solid transparent;
+  border-left: 10rpx solid $color-primary;
+}
+
+.beforeLabel {
+  position: absolute;
+  top: $spacing-sm;
+  left: $spacing-sm;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+  z-index: 3;
+}
+
+.afterLabel {
+  position: absolute;
+  top: $spacing-sm;
+  right: $spacing-sm;
+  background: rgba(212, 160, 184, 0.8);
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+  z-index: 1;
+}
+
+.labelText {
+  font-size: $font-size-xs;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.dateInfo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-md;
+  gap: $spacing-md;
+}
+
+.dateText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+}
+
+.dateArrow {
+  width: 40rpx;
+  height: 4rpx;
+  background: $color-border;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -4rpx;
+    width: 0;
+    height: 0;
+    border-top: 6rpx solid transparent;
+    border-bottom: 6rpx solid transparent;
+    border-left: 8rpx solid $color-border;
+  }
+}

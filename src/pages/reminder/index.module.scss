@@ -1,0 +1,147 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: $spacing-xl;
+}
+
+.header {
+  padding: $spacing-lg $page-padding $spacing-sm;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.desc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.filterRow {
+  display: flex;
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-md;
+  gap: $spacing-sm;
+  @include scroll-x-container;
+  overflow-x: auto;
+}
+
+.filterTag {
+  @include scroll-x-item(auto);
+  padding: 8rpx 24rpx;
+  border-radius: $radius-round;
+  background: $color-bg-card;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.05);
+  transition: all $transition-base;
+
+  &.active {
+    background: $color-primary;
+    box-shadow: none;
+  }
+}
+
+.filterText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+
+  .active & {
+    color: #ffffff;
+  }
+}
+
+.statsRow {
+  display: flex;
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+  gap: $spacing-sm;
+}
+
+.statItem {
+  flex: 1;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  @include flex-center;
+  flex-direction: column;
+}
+
+.statNumber {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-primary-dark;
+  margin-bottom: 4rpx;
+}
+
+.statLabel {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.list {
+  padding: 0 $page-padding;
+}
+
+.completedSection {
+  margin-top: $spacing-lg;
+}
+
+.completedHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-sm;
+}
+
+.completedTitle {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.emptyWrap {
+  @include flex-center;
+  flex-direction: column;
+  padding: 120rpx 0;
+}
+
+.emptyText {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.abnormalBtn {
+  position: fixed;
+  bottom: 40rpx;
+  right: $page-padding;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: $radius-round;
+  background: linear-gradient(135deg, $color-error 0%, #F0A0A0 100%);
+  box-shadow: 0 4rpx 16rpx rgba(224, 128, 128, 0.4);
+  @include flex-center;
+  flex-direction: column;
+  z-index: 100;
+  transition: all $transition-base;
+
+  &:active {
+    transform: scale(0.95);
+  }
+}
+
+.abnormalBtnIcon {
+  font-size: 36rpx;
+  margin-bottom: 2rpx;
+}
+
+.abnormalBtnText {
+  font-size: $font-size-xs;
+  color: #ffffff;
+  white-space: nowrap;
+}

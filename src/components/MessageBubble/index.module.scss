@@ -1,0 +1,131 @@
+@use '@/styles/variables.scss' as *;
+
+.container {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+}
+
+.typeTag {
+  padding: 2rpx 12rpx;
+  border-radius: $radius-round;
+  margin-right: $spacing-sm;
+
+  &.type_question {
+    background: rgba(184, 160, 212, 0.15);
+
+    .typeTagText {
+      color: $color-secondary-dark;
+    }
+  }
+
+  &.type_abnormal {
+    background: rgba(224, 128, 128, 0.15);
+
+    .typeTagText {
+      color: $color-error;
+    }
+  }
+
+  &.type_followup {
+    background: rgba(240, 176, 112, 0.15);
+
+    .typeTagText {
+      color: $color-warning;
+    }
+  }
+
+  &.type_general {
+    background: rgba(155, 139, 152, 0.12);
+
+    .typeTagText {
+      color: $color-text-tertiary;
+    }
+  }
+}
+
+.typeTagText {
+  font-size: $font-size-xs;
+  white-space: nowrap;
+  font-weight: $font-weight-medium;
+}
+
+.treatmentName {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  flex: 1;
+  @include text-ellipsis;
+}
+
+.statusDot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: $radius-round;
+  background: $color-warning;
+  flex-shrink: 0;
+  margin-left: $spacing-sm;
+
+  &.replied {
+    background: $color-success;
+  }
+}
+
+.content {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: $line-height-loose;
+  margin-bottom: $spacing-sm;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.replyWrap {
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-top: $spacing-sm;
+  border-left: 4rpx solid $color-primary;
+}
+
+.replyHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.replyDot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  margin-right: $spacing-xs;
+}
+
+.replyLabel {
+  font-size: $font-size-sm;
+  color: $color-primary-dark;
+  font-weight: $font-weight-medium;
+}
+
+.replyContent {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+  margin-bottom: $spacing-xs;
+}
+
+.replyTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}

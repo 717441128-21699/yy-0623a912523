@@ -1,0 +1,221 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, $color-bg-gradient-start 0%, $color-bg-page 30%);
+  padding-bottom: 120rpx;
+}
+
+.profileCard {
+  margin: $spacing-lg $page-padding 0;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-xl;
+  padding: $spacing-xl $spacing-lg;
+  display: flex;
+  align-items: center;
+  box-shadow: 0 4rpx 20rpx rgba(212, 160, 184, 0.3);
+}
+
+.avatar {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-round;
+  border: 4rpx solid rgba(255, 255, 255, 0.5);
+  margin-right: $spacing-lg;
+  flex-shrink: 0;
+}
+
+.profileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.profileName {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: #ffffff;
+  margin-bottom: $spacing-xs;
+}
+
+.profileMember {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.8);
+  margin-bottom: 4rpx;
+}
+
+.profilePhone {
+  font-size: $font-size-sm;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.quickActions {
+  display: flex;
+  margin: $spacing-lg $page-padding 0;
+  gap: $spacing-sm;
+}
+
+.quickAction {
+  flex: 1;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  @include flex-center;
+  flex-direction: column;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.quickActionIcon {
+  font-size: 48rpx;
+  margin-bottom: $spacing-xs;
+}
+
+.quickActionLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.quickActionBadge {
+  font-size: $font-size-xs;
+  color: $color-primary-dark;
+  margin-top: 4rpx;
+}
+
+.menuSection {
+  margin: $spacing-lg $page-padding 0;
+}
+
+.menuTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.menuCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+.menuItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-md $spacing-lg;
+  transition: all $transition-base;
+
+  &:active {
+    background: $color-bg-hover;
+  }
+
+  & + & {
+    border-top: 1rpx solid $color-divider;
+  }
+}
+
+.menuItemIcon {
+  font-size: 36rpx;
+  margin-right: $spacing-md;
+  width: 48rpx;
+  text-align: center;
+}
+
+.menuItemContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.menuItemLabel {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.menuItemDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.menuItemArrow {
+  font-size: $font-size-sm;
+  color: $color-text-disabled;
+  margin-left: $spacing-sm;
+}
+
+.menuItemBadge {
+  background: $color-error;
+  color: #ffffff;
+  font-size: $font-size-xs;
+  padding: 0 12rpx;
+  border-radius: $radius-round;
+  min-width: 32rpx;
+  height: 32rpx;
+  line-height: 32rpx;
+  text-align: center;
+  margin-right: $spacing-sm;
+}
+
+.reminderPreview {
+  margin: $spacing-lg $page-padding 0;
+}
+
+.reminderCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.reminderHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.reminderTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.reminderMore {
+  font-size: $font-size-sm;
+  color: $color-primary-dark;
+}
+
+.reminderItem {
+  display: flex;
+  align-items: center;
+  padding: $spacing-sm 0;
+
+  & + & {
+    border-top: 1rpx solid $color-divider;
+  }
+}
+
+.reminderIcon {
+  font-size: 28rpx;
+  margin-right: $spacing-sm;
+}
+
+.reminderText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex: 1;
+  @include text-ellipsis;
+}
+
+.reminderTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-left: $spacing-sm;
+  white-space: nowrap;
+}

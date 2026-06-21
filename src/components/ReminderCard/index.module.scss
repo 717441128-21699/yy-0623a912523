@@ -1,0 +1,124 @@
+@use '@/styles/variables.scss' as *;
+
+.card {
+  display: flex;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+}
+
+.completed {
+  opacity: 0.7;
+}
+
+.iconWrap {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: $radius-md;
+  background: rgba(212, 160, 184, 0.12);
+  @include flex-center;
+  flex-shrink: 0;
+  margin-right: $spacing-md;
+}
+
+.iconWrapCompleted {
+  background: rgba(155, 139, 152, 0.1);
+}
+
+.icon {
+  font-size: $font-size-xl;
+}
+
+.content {
+  flex: 1;
+  min-width: 0;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-xs;
+}
+
+.title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-right: $spacing-sm;
+  @include text-ellipsis;
+  flex: 1;
+}
+
+.titleCompleted {
+  text-decoration: line-through;
+  color: $color-text-disabled;
+}
+
+.typeTag {
+  background: $color-tag-bg;
+  padding: 2rpx 12rpx;
+  border-radius: $radius-round;
+  flex-shrink: 0;
+}
+
+.typeTagCompleted {
+  background: rgba(155, 139, 152, 0.1);
+}
+
+.typeTagText {
+  font-size: $font-size-xs;
+  color: $color-tag-text;
+  white-space: nowrap;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xs;
+  @include text-ellipsis-multi(2);
+}
+
+.descriptionCompleted {
+  color: $color-text-disabled;
+}
+
+.treatmentName {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-xs;
+}
+
+.timeRow {
+  display: flex;
+  align-items: center;
+}
+
+.time {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.checkbox {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: $radius-round;
+  border: 2rpx solid $color-border;
+  flex-shrink: 0;
+  @include flex-center;
+  margin-left: $spacing-sm;
+  transition: all $transition-base;
+}
+
+.checkboxChecked {
+  background: $color-primary;
+  border-color: $color-primary;
+}
+
+.checkMark {
+  font-size: $font-size-sm;
+  color: #ffffff;
+  font-weight: $font-weight-bold;
+}

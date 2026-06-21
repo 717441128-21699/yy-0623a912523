@@ -1,0 +1,337 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: linear-gradient(180deg, $color-bg-gradient-start 0%, $color-bg-page 30%);
+  padding-bottom: 120rpx;
+}
+
+.header {
+  padding: $spacing-lg $page-padding $spacing-md;
+}
+
+.title {
+  font-size: $font-size-xxl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.subtitle {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
+}
+
+.sectionHeader {
+  padding: $spacing-md $page-padding $spacing-sm;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.templateScroll {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.templateRow {
+  @include scroll-x-container;
+  padding-bottom: $spacing-sm;
+}
+
+.templateItem {
+  @include scroll-x-item(240rpx);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  margin-right: $spacing-md;
+}
+
+.templateImageWrap {
+  width: 180rpx;
+  height: 180rpx;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  border: 4rpx solid transparent;
+  margin-bottom: $spacing-xs;
+  transition: all $transition-base;
+
+  &.selected {
+    border-color: $color-primary;
+    box-shadow: 0 4rpx 12rpx rgba(212, 160, 184, 0.3);
+  }
+}
+
+.templateImage {
+  width: 100%;
+  height: 100%;
+}
+
+.templateName {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.templateAngle {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  text-align: center;
+}
+
+.treatmentSection {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.treatmentSelector {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.treatmentLabel {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-sm;
+}
+
+.treatmentOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.treatmentOption {
+  padding: 8rpx 20rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  transition: all $transition-base;
+
+  &.selected {
+    background: $color-primary;
+  }
+}
+
+.treatmentOptionText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+
+  .selected & {
+    color: #ffffff;
+  }
+}
+
+.captureArea {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.capturePreview {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  box-shadow: $shadow-card;
+  @include flex-center;
+  flex-direction: column;
+  min-height: 400rpx;
+}
+
+.capturePlaceholder {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  @include flex-center;
+  margin-bottom: $spacing-md;
+}
+
+.captureIcon {
+  font-size: 64rpx;
+  color: $color-primary;
+}
+
+.captureHint {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-xs;
+}
+
+.captureTip {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}
+
+.privacySection {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.privacyCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.privacyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+
+  & + & {
+    border-top: 1rpx solid $color-divider;
+  }
+}
+
+.privacyLabel {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.privacyToggle {
+  width: 80rpx;
+  height: 44rpx;
+  border-radius: $radius-round;
+  background: $color-border;
+  position: relative;
+  transition: all $transition-base;
+
+  &.on {
+    background: $color-primary;
+  }
+}
+
+.privacyToggleKnob {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: $radius-round;
+  background: #ffffff;
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  transition: all $transition-base;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.1);
+
+  .on & {
+    left: 40rpx;
+  }
+}
+
+.feelingSection {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.feelingCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.feelingLabel {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.feelingOptions {
+  display: flex;
+  justify-content: space-between;
+}
+
+.feelingItem {
+  @include flex-center;
+  flex-direction: column;
+  flex: 1;
+}
+
+.feelingCircle {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  @include flex-center;
+  margin-bottom: $spacing-xs;
+  transition: all $transition-base;
+
+  &.selected {
+    background: $color-primary;
+  }
+}
+
+.feelingScore {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-text-secondary;
+
+  .selected & {
+    color: #ffffff;
+  }
+}
+
+.feelingDesc {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  white-space: nowrap;
+}
+
+.notesSection {
+  padding: 0 $page-padding;
+  margin-bottom: $spacing-lg;
+}
+
+.notesCard {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.notesLabel {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.notesInput {
+  width: 100%;
+  min-height: 120rpx;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: $line-height-loose;
+  padding: $spacing-sm;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  border: none;
+  box-sizing: border-box;
+}
+
+.submitBtn {
+  margin: 0 $page-padding;
+  height: $button-height-lg;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  @include flex-center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+}
+
+.submitBtnText {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: #ffffff;
+  white-space: nowrap;
+}

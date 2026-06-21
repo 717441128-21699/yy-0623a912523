@@ -1,0 +1,219 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: $spacing-xl;
+}
+
+.header {
+  padding: $spacing-lg $page-padding $spacing-sm;
+}
+
+.title {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+}
+
+.desc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  line-height: $line-height-loose;
+}
+
+.section {
+  margin: $spacing-lg $page-padding 0;
+}
+
+.sectionTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+}
+
+.card {
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+  overflow: hidden;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-md $spacing-lg;
+
+  & + & {
+    border-top: 1rpx solid $color-divider;
+  }
+}
+
+.rowContent {
+  flex: 1;
+  min-width: 0;
+  margin-right: $spacing-md;
+}
+
+.rowLabel {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  margin-bottom: 4rpx;
+}
+
+.rowDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  @include text-ellipsis-multi(2);
+}
+
+.toggle {
+  width: 80rpx;
+  height: 44rpx;
+  border-radius: $radius-round;
+  background: $color-border;
+  position: relative;
+  transition: all $transition-base;
+  flex-shrink: 0;
+
+  &.on {
+    background: $color-primary;
+  }
+}
+
+.toggleKnob {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: $radius-round;
+  background: #ffffff;
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  transition: all $transition-base;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.1);
+
+  .on & {
+    left: 40rpx;
+  }
+}
+
+.photoList {
+  padding: 0 $page-padding;
+  margin-top: $spacing-md;
+}
+
+.photoItem {
+  display: flex;
+  align-items: center;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-sm;
+}
+
+.photoThumb {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: $radius-md;
+  margin-right: $spacing-md;
+  flex-shrink: 0;
+}
+
+.photoInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.photoDate {
+  font-size: $font-size-sm;
+  color: $color-text-primary;
+  font-weight: $font-weight-medium;
+  margin-bottom: 4rpx;
+}
+
+.photoAngle {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.photoPrivacy {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+  margin-left: $spacing-sm;
+
+  &.private {
+    background: rgba(155, 139, 152, 0.12);
+  }
+
+  &.public {
+    background: rgba(212, 160, 184, 0.12);
+  }
+}
+
+.photoPrivacyText {
+  font-size: $font-size-xs;
+  white-space: nowrap;
+
+  .private & {
+    color: $color-text-tertiary;
+  }
+
+  .public & {
+    color: $color-primary-dark;
+  }
+}
+
+.shareSection {
+  margin: $spacing-lg $page-padding 0;
+}
+
+.shareCard {
+  background: linear-gradient(135deg, rgba(212, 160, 184, 0.1) 0%, rgba(184, 160, 212, 0.1) 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  border: 1rpx solid rgba(212, 160, 184, 0.2);
+}
+
+.shareTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.shareDesc {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+  margin-bottom: $spacing-md;
+}
+
+.shareRules {
+  margin-bottom: $spacing-md;
+}
+
+.shareRule {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: $spacing-xs;
+}
+
+.shareRuleDot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  margin-right: $spacing-sm;
+  margin-top: 12rpx;
+  flex-shrink: 0;
+}
+
+.shareRuleText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+}
