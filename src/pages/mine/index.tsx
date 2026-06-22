@@ -2,15 +2,39 @@ import React from 'react'
 import { View, Text, ScrollView, Image } from '@tarojs/components'
 import { userInfo } from '@/data/messages'
 import { reminders } from '@/data/reminders'
-import { messages } from '@/data/messages'
 import { treatments } from '@/data/treatments'
+import { useAppStore } from '@/store/index'
 import styles from './index.module.scss'
 import Taro from '@tarojs/taro'
 
 const MinePage = () => {
+  const role = useAppStore(s => s.role)
+  const messages = useAppStore(s => s.messages)
+  const setRole = useAppStore(s => s.setRole)
+  const resetToDefault = useAppStore(s => s.resetToDefault)
+
   const activeTreatments = treatments.filter(t => t.status === 'active')
   const unreadMessages = messages.filter(m => m.status === 'sent').length
   const todayReminders = reminders.filter(r => !r.isCompleted).slice(0, 3)
+
+  const handleToggleRole = () => {
+    const next = role === 'customer' ? 'doctor' : 'customer'
+    setRole(next)
+    Taro.showToast({ title: `已切换到${next === 'doctor' ? '医生' : '顾客'}视角`, icon: 'none' })
+  }
+
+  const handleReset = () => {
+    Taro.showModal({
+      title: '重置数据',
+      content: '确定要重置所有打卡、留言和设置为默认数据吗？',
+      success: (res) => {
+        if (res.confirm) {
+          resetToDefault()
+          Taro.showToast({ title: '已重置', icon: 'success' })
+        }
+      }
+    })
+  }
 
   const typeIcons = {
     sunscreen: '☀',
@@ -106,6 +130,38 @@ const MinePage = () => {
             <View className={styles.menuItemContent}>
               <Text className={styles.menuItemLabel}>效果对比</Text>
               <Text className={styles.menuItemDesc}>查看治疗前后变化</Text>
+            </View>
+            <Text className={styles.menuItemArrow}>›</Text>
+          </View>
+        </View>
+      </View>
+
+      <View className={styles.menuSection}>
+        <Text className={styles.menuTitle}>医生协同</Text>
+        <View className={styles.menuCard}>
+          <View className={styles.menuItem} onClick={handleToggleRole}>
+            <Text className={styles.menuItemIcon}>{role === 'doctor' ? '👩‍⚕️' : '🧑‍💻'}</Text>
+            <View className={styles.menuItemContent}>
+              <Text className={styles.menuItemLabel}>
+                当前视角：{role === 'doctor' ? '医生端' : '顾客端'}
+              </Text>
+              <Text className={styles.menuItemDesc}>
+                点击切换到{role === 'doctor' ? '顾客' : '医生'}视角体验
+              </Text>
+            </View>
+            <Text className={styles.menuItemArrow}>切换</Text>
+          </View>
+        </View>
+      </View>
+
+      <View className={styles.menuSection}>
+        <Text className={styles.menuTitle}>其他</Text>
+        <View className={styles.menuCard}>
+          <View className={styles.menuItem} onClick={handleReset}>
+            <Text className={styles.menuItemIcon}>🔄</Text>
+            <View className={styles.menuItemContent}>
+              <Text className={styles.menuItemLabel}>重置为默认数据</Text>
+              <Text className={styles.menuItemDesc}>清除所有打卡、留言和设置</Text>
             </View>
             <Text className={styles.menuItemArrow}>›</Text>
           </View>

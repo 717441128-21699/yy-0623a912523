@@ -1,26 +1,37 @@
 import React, { useState, useMemo } from 'react'
-import { View, Text, ScrollView } from '@tarojs/components'
+import { View, Text, ScrollView, Picker } from '@tarojs/components'
 import { treatments } from '@/data/treatments'
 import { useAppStore } from '@/store/index'
+import { ShareTemplate } from '@/types/index'
 import CompareSlider from '@/components/CompareSlider'
 import PhotoTimeline from '@/components/PhotoTimeline'
 import styles from './index.module.scss'
 import classnames from 'classnames'
 import Taro from '@tarojs/taro'
 
+const templateLabels: Record<ShareTemplate, string> = {
+  compare: '前后对比',
+  timeline: '完整时间线',
+  summary: '仅变化摘要'
+}
+
 const ComparePage = () => {
   const photos = useAppStore(s => s.photos)
   const shareAuth = useAppStore(s => s.shareAuth)
+  const role = useAppStore(s => s.role)
+  const shareRecords = useAppStore(s => s.shareRecords)
 
   const treatmentIds = useMemo(() => [...new Set(photos.map(p => p.treatmentId))], [photos])
   const treatmentOptions = treatments.filter(t => treatmentIds.includes(t.id))
   const [selectedTreatment, setSelectedTreatment] = useState(treatmentOptions[0]?.id || '')
 
   const treatmentPhotos = useMemo(() => {
-    return photos
-      .filter(p => p.treatmentId === selectedTreatment)
-      .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-  }, [selectedTreatment, photos])
+    let list = photos.filter(p => p.treatmentId === selectedTreatment)
+    if (role === 'doctor') {
+      list = list.filter(p => !p.isPrivate && p.visibleToDoctor)
+    }
+    return list.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
+  }, [selectedTreatment, photos, role])
 
   const comparePair = useMemo(() => {
     if (treatmentPhotos.length < 2) return null
@@ -29,6 +40,16 @@ const ComparePage = () => {
       after: treatmentPhotos[treatmentPhotos.length - 1]
     }
   }, [treatmentPhotos])
+
+  const lastShare = useMemo(() => {
+    return shareRecords.find(s => s.treatmentId === selectedTreatment)
+  }, [shareRecords, selectedTreatment])
+
+  const goSharePreview = (template: ShareTemplate) => {
+    Taro.navigateTo({
+      url: `/pages/sharePreview/index?treatmentId=${selectedTreatment}&template=${template}`
+    })
+  }
 
   const handleShare = () => {
     if (!shareAuth) {
@@ -40,20 +61,39 @@ const ComparePage = () => {
         success: (res) => {
           if (res.confirm) {
             console.info('[Compare] share authorized')
-            Taro.navigateTo({ url: `/pages/sharePreview/index?treatmentId=${selectedTreatment}` })
+            showTemplatePicker()
           }
         }
       })
       return
     }
-    Taro.navigateTo({ url: `/pages/sharePreview/index?treatmentId=${selectedTreatment}` })
+    showTemplatePicker()
+  }
+
+  const showTemplatePicker = () => {
+    Taro.showActionSheet({
+      itemList: ['前后对比图', '完整时间线', '仅变化摘要'],
+      success: (res) => {
+        const templates: ShareTemplate[] = ['compare', 'timeline', 'summary']
+        goSharePreview(templates[res.tapIndex])
+      }
+    })
   }
 
   return (
     <ScrollView className={styles.page} scrollY>
       <View className={styles.header}>
-        <Text className={styles.title}>效果对比</Text>
-        <Text className={styles.subtitle}>看见每一份变化</Text>
+        <View className={styles.headerTitleRow}>
+          <Text className={styles.title}>效果对比</Text>
+          {role === 'doctor' && (
+            <View className={styles.doctorBadge}>
+              <Text className={styles.doctorBadgeText}>👩‍⚕️ 医生视角</Text>
+            </View>
+          )}
+        </View>
+        <Text className={styles.subtitle}>
+          {role === 'doctor' ? '仅展示授权可见的照片' : '看见每一份变化'}
+        </Text>
       </View>
 
       <View className={styles.treatmentFilter}>
@@ -92,7 +132,7 @@ const ComparePage = () => {
               <View className={styles.summaryDot} />
               <Text className={styles.summaryText}>最新感受：{comparePair.after.feeling}</Text>
             </View>
-            {treatmentPhotos.some(p => p.isPrivate) && (
+            {role === 'customer' && treatmentPhotos.some(p => p.isPrivate) && (
               <View className={styles.summaryItem}>
                 <View className={styles.summaryDot} />
                 <Text className={styles.summaryText}>
@@ -100,6 +140,33 @@ const ComparePage = () => {
                 </Text>
               </View>
             )}
+            {role === 'doctor' && (
+              <View className={styles.summaryItem}>
+                <View className={styles.summaryDot} />
+                <Text className={styles.summaryText}>
+                  顾客已授权 {treatmentPhotos.length} 张照片供您查看
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+      )}
+
+      {role === 'customer' && lastShare && (
+        <View className={styles.shareRecordCard}>
+          <View className={styles.shareRecordHeader}>
+            <Text className={styles.shareRecordTitle}>📤 最近分享</Text>
+            <Text className={styles.shareRecordTime}>{lastShare.createdAt}</Text>
+          </View>
+          <View className={styles.shareRecordBody}>
+            <View className={styles.shareRecordInfo}>
+              <Text className={styles.shareRecordLabel}>模板</Text>
+              <Text className={styles.shareRecordValue}>{templateLabels[lastShare.template]}</Text>
+            </View>
+            <View className={styles.shareRecordInfo}>
+              <Text className={styles.shareRecordLabel}>照片数</Text>
+              <Text className={styles.shareRecordValue}>{lastShare.photoCount} 张</Text>
+            </View>
           </View>
         </View>
       )}
@@ -107,15 +174,19 @@ const ComparePage = () => {
       <View className={styles.timelineSection}>
         <View className={styles.sectionHeader}>
           <Text className={styles.sectionTitle}>恢复时间线</Text>
-          <View className={styles.shareBtn} onClick={handleShare}>
-            <Text className={styles.shareBtnText}>生成分享图</Text>
-          </View>
+          {role === 'customer' && (
+            <View className={styles.shareBtn} onClick={handleShare}>
+              <Text className={styles.shareBtnText}>生成分享图</Text>
+            </View>
+          )}
         </View>
         {treatmentPhotos.length > 0 ? (
           <PhotoTimeline photos={treatmentPhotos} />
         ) : (
           <View className={styles.emptyWrap}>
-            <Text className={styles.emptyText}>暂无照片记录</Text>
+            <Text className={styles.emptyText}>
+              {role === 'doctor' ? '暂无授权可见的照片' : '暂无照片记录'}
+            </Text>
           </View>
         )}
       </View>

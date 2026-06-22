@@ -71,11 +71,24 @@
   background: rgba(155, 139, 152, 0.12);
   padding: 2rpx 12rpx;
   border-radius: $radius-round;
+  margin-right: $spacing-xs;
 }
 
 .privateTagText {
   font-size: $font-size-xs;
   color: $color-text-tertiary;
+  white-space: nowrap;
+}
+
+.doctorTag {
+  background: rgba(184, 160, 212, 0.18);
+  padding: 2rpx 12rpx;
+  border-radius: $radius-round;
+}
+
+.doctorTagText {
+  font-size: $font-size-xs;
+  color: $color-secondary-dark;
   white-space: nowrap;
 }
 

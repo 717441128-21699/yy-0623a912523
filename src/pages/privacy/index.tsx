@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Image } from '@tarojs/components'
 import { useAppStore } from '@/store/index'
 import styles from './index.module.scss'
 import classnames from 'classnames'
+import Taro from '@tarojs/taro'
 
 const PrivacyPage = () => {
   const photos = useAppStore(s => s.photos)
@@ -13,9 +14,26 @@ const PrivacyPage = () => {
   const setShareAuth = useAppStore(s => s.setShareAuth)
   const setDoctorVisible = useAppStore(s => s.setDoctorVisible)
   const setPhotoPrivate = useAppStore(s => s.setPhotoPrivate)
+  const setPhotoVisibleToDoctor = useAppStore(s => s.setPhotoVisibleToDoctor)
 
   const togglePhotoPrivacy = (id: string, currentVal: boolean) => {
-    setPhotoPrivate(id, !currentVal)
+    const nextVal = !currentVal
+    if (currentVal === true && nextVal === false) {
+      Taro.showModal({
+        title: '取消私密',
+        content: '是否同时开放给医生/咨询师查看？',
+        confirmText: '同时开放',
+        cancelText: '暂不开放',
+        success: (res) => {
+          setPhotoPrivate(id, false)
+          if (res.confirm) {
+            setPhotoVisibleToDoctor(id, true)
+          }
+        }
+      })
+    } else {
+      setPhotoPrivate(id, nextVal)
+    }
   }
 
   return (

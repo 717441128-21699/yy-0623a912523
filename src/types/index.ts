@@ -25,6 +25,23 @@ export interface PhotoRecord {
   feeling: string;
   feelingScore: number;
   annotations: PhotoAnnotation[];
+  doctorNote?: string;
+  doctorNoteAt?: string;
+}
+
+export type UserRole = 'customer' | 'doctor';
+
+export type ShareTemplate = 'compare' | 'timeline' | 'summary';
+
+export interface ShareRecord {
+  id: string;
+  treatmentId: string;
+  treatmentName: string;
+  template: ShareTemplate;
+  previewImage: string;
+  summary: string;
+  createdAt: string;
+  photoCount: number;
 }
 
 export interface PhotoAnnotation {

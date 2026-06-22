@@ -6,8 +6,41 @@
   padding-bottom: 200rpx;
 }
 
+.templateTabs {
+  display: flex;
+  padding: $spacing-md $page-padding;
+  gap: $spacing-xs;
+  background: $color-bg-card;
+  margin-bottom: $spacing-md;
+  border-bottom: 1rpx solid $color-divider;
+}
+
+.templateTab {
+  flex: 1;
+  height: 64rpx;
+  border-radius: $radius-round;
+  @include flex-center;
+  background: $color-bg-hover;
+  transition: all $transition-base;
+
+  &.active {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  }
+}
+
+.templateTabText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+
+  .active & {
+    color: #ffffff;
+    font-weight: $font-weight-semibold;
+  }
+}
+
 .previewCard {
-  margin: $spacing-lg $page-padding $spacing-md;
+  margin: 0 $page-padding $spacing-md;
   background: linear-gradient(180deg, #FFF8FB 0%, #FFFFFF 100%);
   border-radius: $radius-xl;
   padding: $spacing-lg;
@@ -20,7 +53,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $spacing-md;
+  margin-bottom: $spacing-sm;
 }
 
 .previewTitle {
@@ -30,7 +63,7 @@
 }
 
 .previewLogo {
-  font-size: $font-size-md;
+  font-size: $font-size-sm;
   color: $color-primary-dark;
   font-weight: $font-weight-semibold;
 }
@@ -96,6 +129,92 @@
   font-size: 20rpx;
   color: #ffffff;
   white-space: nowrap;
+}
+
+.timelineSection {
+  margin-bottom: $spacing-md;
+}
+
+.timelineTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.timelineGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+}
+
+.timelineGridItem {
+  width: calc(33.33% - 8rpx);
+  position: relative;
+  border-radius: $radius-sm;
+  overflow: hidden;
+}
+
+.timelineGridImg {
+  width: 100%;
+  height: 200rpx;
+}
+
+.timelineGridDate {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 4rpx 0;
+  text-align: center;
+}
+
+.timelineGridDateText {
+  font-size: 20rpx;
+  color: #ffffff;
+}
+
+.summaryOnlyCard {
+  background: linear-gradient(135deg, rgba(212, 160, 184, 0.12) 0%, rgba(184, 160, 212, 0.1) 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-xl $spacing-lg;
+  text-align: center;
+  margin-bottom: $spacing-md;
+}
+
+.summaryOnlyTitle {
+  display: block;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-bold;
+  color: $color-primary-dark;
+  margin-bottom: $spacing-xs;
+}
+
+.summaryOnlyDesc {
+  display: block;
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-md;
+}
+
+.summaryOnlyBig {
+  display: flex;
+  align-items: baseline;
+  justify-content: center;
+  gap: $spacing-xs;
+}
+
+.summaryBigNum {
+  font-size: 80rpx;
+  font-weight: $font-weight-bold;
+  color: $color-primary-dark;
+  line-height: 1;
+}
+
+.summaryBigLabel {
+  font-size: $font-size-md;
+  color: $color-text-tertiary;
 }
 
 .summarySection {
@@ -207,14 +326,16 @@
   text-align: center;
   padding-top: $spacing-md;
   border-top: 1rpx dashed $color-border;
+  margin-top: $spacing-sm;
 }
 
 .footerBrandText {
-  font-size: $font-size-xs;
+  font-size: $font-size-sm;
   color: $color-text-tertiary;
 }
 
 .footerBrandSub {
+  display: block;
   font-size: 20rpx;
   color: $color-text-disabled;
   margin-top: 4rpx;
@@ -293,4 +414,5 @@
   color: $color-text-tertiary;
   text-align: center;
   line-height: $line-height-loose;
+  white-space: pre-line;
 }

@@ -1,17 +1,28 @@
-import React, { useMemo } from 'react'
+import React, { useState, useMemo } from 'react'
 import { View, Text, Image, ScrollView } from '@tarojs/components'
 import { useRouter } from '@tarojs/taro'
 import { treatments } from '@/data/treatments'
 import { useAppStore } from '@/store/index'
+import { ShareTemplate } from '@/types/index'
 import styles from './index.module.scss'
 import classnames from 'classnames'
 import Taro from '@tarojs/taro'
 
+const templateLabels: Record<ShareTemplate, string> = {
+  compare: '前后对比',
+  timeline: '完整时间线',
+  summary: '仅摘要'
+}
+
 const SharePreviewPage = () => {
   const router = useRouter()
   const treatmentId = router.params.treatmentId || ''
+  const templateParam = (router.params.template as ShareTemplate) || 'compare'
   const photos = useAppStore(s => s.photos)
+  const addShareRecord = useAppStore(s => s.addShareRecord)
   const treatment = treatments.find(t => t.id === treatmentId)
+
+  const [template, setTemplate] = useState<ShareTemplate>(templateParam)
 
   const publicPhotos = useMemo(() => {
     return photos
@@ -30,25 +41,56 @@ const SharePreviewPage = () => {
     }
   }, [publicPhotos])
 
+  const summaryText = useMemo(() => {
+    if (publicPhotos.length === 0) return '暂无公开照片'
+    const start = publicPhotos[0].date
+    const end = publicPhotos[publicPhotos.length - 1].date
+    const feeling = comparePair?.after.feeling || '—'
+    return `${treatment?.name || '疗程'}：${start} 至 ${end}，共 ${publicPhotos.length} 次记录，最新感受：${feeling}`
+  }, [publicPhotos, comparePair, treatment])
+
   const handleCancel = () => {
     Taro.navigateBack()
   }
 
   const handleSave = () => {
-    console.info('[SharePreview] save confirmed', { treatmentId, count: publicPhotos.length })
+    const previewImg = template === 'summary'
+      ? ''
+      : (comparePair?.after.imageUrl || publicPhotos[0]?.imageUrl || '')
+    addShareRecord({
+      treatmentId,
+      treatmentName: treatment?.name || '',
+      template,
+      previewImage: previewImg,
+      summary: summaryText,
+      photoCount: publicPhotos.length
+    })
+    console.info('[SharePreview] saved share record', { template, count: publicPhotos.length })
     Taro.showToast({ title: '已保存分享图', icon: 'success' })
     setTimeout(() => Taro.navigateBack(), 800)
   }
 
-  if (publicPhotos.length === 0) {
+  if (publicPhotos.length === 0 && template !== 'summary') {
     return (
       <ScrollView className={styles.page} scrollY>
+        <View className={styles.templateTabs}>
+          {(Object.keys(templateLabels) as ShareTemplate[]).map(t => (
+            <View
+              key={t}
+              className={classnames(styles.templateTab, template === t && styles.active)}
+              onClick={() => setTemplate(t)}
+            >
+              <Text className={styles.templateTabText}>{templateLabels[t]}</Text>
+            </View>
+          ))}
+        </View>
+
         <View className={styles.emptyCard}>
           <Text className={styles.emptyIcon}>🔒</Text>
           <Text className={styles.emptyTitle}>暂无可分享内容</Text>
           <Text className={styles.emptyDesc}>
             该疗程下的所有照片均已设为仅自己可见。{'\n'}
-            如需生成分享图，请在隐私设置中将部分照片改为公开。
+            如需生成带图分享，请在隐私设置中将部分照片改为公开。
           </Text>
         </View>
         <View className={styles.bottomBar}>
@@ -68,6 +110,18 @@ const SharePreviewPage = () => {
 
   return (
     <ScrollView className={styles.page} scrollY>
+      <View className={styles.templateTabs}>
+        {(Object.keys(templateLabels) as ShareTemplate[]).map(t => (
+          <View
+            key={t}
+            className={classnames(styles.templateTab, template === t && styles.active)}
+            onClick={() => setTemplate(t)}
+          >
+            <Text className={styles.templateTabText}>{templateLabels[t]}</Text>
+          </View>
+        ))}
+      </View>
+
       <View className={styles.previewCard}>
         <View className={styles.previewHeader}>
           <Text className={styles.previewTitle}>我的美丽日记</Text>
@@ -75,7 +129,7 @@ const SharePreviewPage = () => {
         </View>
         <Text className={styles.previewSubTitle}>{treatment?.name || '疗程恢复记录'}</Text>
 
-        {privateCount > 0 && (
+        {privateCount > 0 && template !== 'summary' && (
           <View className={styles.privacyHint}>
             <Text className={styles.privacyIcon}>🔒</Text>
             <Text className={styles.privacyText}>
@@ -84,7 +138,7 @@ const SharePreviewPage = () => {
           </View>
         )}
 
-        {comparePair && (
+        {template === 'compare' && comparePair && (
           <View className={styles.compareRow}>
             <View className={styles.compareImgWrap}>
               <Image className={styles.compareImg} src={comparePair.before.imageUrl} mode='aspectFill' />
@@ -107,12 +161,41 @@ const SharePreviewPage = () => {
           </View>
         )}
 
+        {template === 'timeline' && (
+          <View className={styles.timelineSection}>
+            <Text className={styles.timelineTitle}>📷 恢复记录</Text>
+            <View className={styles.timelineGrid}>
+              {publicPhotos.map(p => (
+                <View key={p.id} className={styles.timelineGridItem}>
+                  <Image className={styles.timelineGridImg} src={p.imageUrl} mode='aspectFill' />
+                  <View className={styles.timelineGridDate}>
+                    <Text className={styles.timelineGridDateText}>{p.date.slice(5)}</Text>
+                  </View>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
+
+        {template === 'summary' && (
+          <View className={styles.summaryOnlyCard}>
+            <Text className={styles.summaryOnlyTitle}>✨ 变化摘要</Text>
+            <Text className={styles.summaryOnlyDesc}>
+              {treatment?.name || '疗程'}恢复记录
+            </Text>
+            <View className={styles.summaryOnlyBig}>
+              <Text className={styles.summaryBigNum}>{publicPhotos.length}</Text>
+              <Text className={styles.summaryBigLabel}>次记录</Text>
+            </View>
+          </View>
+        )}
+
         <View className={styles.summarySection}>
-          <Text className={styles.summaryTitle}>✨ 变化摘要</Text>
+          <Text className={styles.summaryTitle}>变化摘要</Text>
           <View className={styles.summaryItem}>
             <View className={styles.summaryDot} />
             <Text className={styles.summaryText}>
-              治疗周期：{publicPhotos[0].date} 至 {publicPhotos[publicPhotos.length - 1].date}
+              治疗周期：{publicPhotos[0]?.date || '—'} 至 {publicPhotos[publicPhotos.length - 1]?.date || '—'}
             </Text>
           </View>
           <View className={styles.summaryItem}>
@@ -129,20 +212,6 @@ const SharePreviewPage = () => {
             <View className={styles.summaryDot} />
             <Text className={styles.summaryText}>主治医师：{treatment?.doctorName || '专属医生'}</Text>
           </View>
-        </View>
-
-        <View className={styles.timelineMini}>
-          <Text className={styles.timelineMiniTitle}>📷 恢复记录</Text>
-          <ScrollView className={styles.timelineThumbs} scrollX>
-            {publicPhotos.map(p => (
-              <View key={p.id} className={styles.timelineThumb}>
-                <Image className={styles.timelineThumbImg} src={p.imageUrl} mode='aspectFill' />
-                <View className={styles.timelineThumbDate}>
-                  <Text className={styles.timelineThumbDateText}>{p.date.slice(5)}</Text>
-                </View>
-              </View>
-            ))}
-          </ScrollView>
         </View>
 
         <View className={styles.footerBrand}>

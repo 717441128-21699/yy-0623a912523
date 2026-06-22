@@ -30,6 +30,11 @@ const PhotoTimeline: React.FC<PhotoTimelineProps> = ({ photos }) => {
                   <Text className={styles.privateTagText}>仅自己可见</Text>
                 </View>
               )}
+              {photo.doctorNote && (
+                <View className={styles.doctorTag}>
+                  <Text className={styles.doctorTagText}>👩‍⚕️ 医生回复</Text>
+                </View>
+              )}
             </View>
             <View className={styles.photoWrap}>
               <Image className={styles.photo} src={photo.imageUrl} mode='aspectFill' />

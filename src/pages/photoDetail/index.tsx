@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import { View, Text, Image, Input } from '@tarojs/components'
+import { View, Text, Image, Input, Textarea } from '@tarojs/components'
 import { useAppStore } from '@/store/index'
 import { useRouter } from '@tarojs/taro'
 import styles from './index.module.scss'
@@ -12,15 +12,19 @@ const PhotoDetailPage = () => {
   const router = useRouter()
   const photoId = router.params.id || ''
   const photos = useAppStore(s => s.photos)
+  const role = useAppStore(s => s.role)
   const setPhotoPrivate = useAppStore(s => s.setPhotoPrivate)
-  const updatePhoto = useAppStore(s => s.updatePhoto)
+  const setPhotoVisibleToDoctor = useAppStore(s => s.setPhotoVisibleToDoctor)
   const addAnnotation = useAppStore(s => s.addAnnotation)
+  const setDoctorNote = useAppStore(s => s.setDoctorNote)
 
   const photo = useMemo(() => photos.find(p => p.id === photoId), [photos, photoId])
 
   const [showAnnotateModal, setShowAnnotateModal] = useState(false)
   const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null)
   const [annotationText, setAnnotationText] = useState('')
+  const [doctorNoteText, setDoctorNoteText] = useState('')
+  const [showDoctorNoteModal, setShowDoctorNoteModal] = useState(false)
 
   if (!photo) {
     return (
@@ -34,9 +38,7 @@ const PhotoDetailPage = () => {
 
   const handleImageTouch = (e) => {
     const touch = e.touches[0]
-    const rect = e.currentTarget.getBoundingClientRect ? null : null
     if (touch && touch.clientX !== undefined) {
-      const target = e.currentTarget
       const rectInfo = (e.currentTarget as any).getBoundingClientRect ?
         (e.currentTarget as any).getBoundingClientRect() : { left: 0, top: 0, width: 343, height: 250 }
       const x = ((touch.clientX - rectInfo.left) / rectInfo.width) * 100
@@ -70,6 +72,41 @@ const PhotoDetailPage = () => {
     setShowAnnotateModal(false)
     setPendingPoint(null)
     setAnnotationText('')
+  }
+
+  const openDoctorNoteModal = () => {
+    setDoctorNoteText(photo.doctorNote || '')
+    setShowDoctorNoteModal(true)
+  }
+
+  const handleSaveDoctorNote = () => {
+    if (!doctorNoteText.trim()) {
+      Taro.showToast({ title: '请输入专业建议', icon: 'none' })
+      return
+    }
+    setDoctorNote(photo.id, doctorNoteText.trim())
+    setShowDoctorNoteModal(false)
+    Taro.showToast({ title: '已保存建议', icon: 'success' })
+  }
+
+  const handleTogglePrivate = () => {
+    const nextVal = !photo.isPrivate
+    if (photo.isPrivate === true && nextVal === false) {
+      Taro.showModal({
+        title: '取消私密',
+        content: '是否同时开放给医生/咨询师查看？',
+        confirmText: '同时开放',
+        cancelText: '暂不开放',
+        success: (res) => {
+          setPhotoPrivate(photo.id, false)
+          if (res.confirm) {
+            setPhotoVisibleToDoctor(photo.id, true)
+          }
+        }
+      })
+    } else {
+      setPhotoPrivate(photo.id, nextVal)
+    }
   }
 
   return (
@@ -135,6 +172,31 @@ const PhotoDetailPage = () => {
         )}
       </View>
 
+      {photo.doctorNote && (
+        <View className={classnames(styles.section, styles.doctorSection)}>
+          <View className={styles.doctorSectionHeader}>
+            <Text className={styles.sectionTitle}>👩‍⚕️ 医生专业建议</Text>
+            {photo.doctorNoteAt && (
+              <Text className={styles.doctorNoteTime}>{photo.doctorNoteAt}</Text>
+            )}
+          </View>
+          <Text className={styles.doctorNoteText}>{photo.doctorNote}</Text>
+        </View>
+      )}
+
+      {role === 'doctor' && (
+        <View className={styles.section}>
+          <View className={styles.doctorSectionHeader}>
+            <Text className={styles.sectionTitle}>✍️ 写专业建议</Text>
+          </View>
+          <View className={styles.doctorNoteEditor} onClick={openDoctorNoteModal}>
+            <Text className={styles.doctorNotePlaceholder}>
+              {photo.doctorNote || '点击此处为这张照片写专业建议...'}
+            </Text>
+          </View>
+        </View>
+      )}
+
       {photo.annotations.length > 0 && (
         <View className={styles.section}>
           <Text className={styles.sectionTitle}>圈选备注（{photo.annotations.length}处）</Text>
@@ -151,27 +213,29 @@ const PhotoDetailPage = () => {
         </View>
       )}
 
-      <View className={styles.privacySection}>
-        <Text className={styles.sectionTitle}>隐私设置</Text>
-        <View className={styles.privacyRow}>
-          <Text className={styles.privacyLabel}>仅自己可见</Text>
-          <View
-            className={classnames(styles.privacyToggle, photo.isPrivate && styles.on)}
-            onClick={() => setPhotoPrivate(photo.id, !photo.isPrivate)}
-          >
-            <View className={styles.privacyToggleKnob} />
+      {role === 'customer' && (
+        <View className={styles.privacySection}>
+          <Text className={styles.sectionTitle}>隐私设置</Text>
+          <View className={styles.privacyRow}>
+            <Text className={styles.privacyLabel}>仅自己可见</Text>
+            <View
+              className={classnames(styles.privacyToggle, photo.isPrivate && styles.on)}
+              onClick={() => handleTogglePrivate()}
+            >
+              <View className={styles.privacyToggleKnob} />
+            </View>
+          </View>
+          <View className={styles.privacyRow}>
+            <Text className={styles.privacyLabel}>允许医生/咨询师查看</Text>
+            <View
+              className={classnames(styles.privacyToggle, photo.visibleToDoctor && styles.on)}
+              onClick={() => setPhotoVisibleToDoctor(photo.id, !photo.visibleToDoctor)}
+            >
+              <View className={styles.privacyToggleKnob} />
+            </View>
           </View>
         </View>
-        <View className={styles.privacyRow}>
-          <Text className={styles.privacyLabel}>允许医生/咨询师查看</Text>
-          <View
-            className={classnames(styles.privacyToggle, photo.visibleToDoctor && styles.on)}
-            onClick={() => updatePhoto(photo.id, { visibleToDoctor: !photo.visibleToDoctor })}
-          >
-            <View className={styles.privacyToggleKnob} />
-          </View>
-        </View>
-      </View>
+      )}
 
       <View className={styles.bottomBar}>
         <View
@@ -180,12 +244,21 @@ const PhotoDetailPage = () => {
         >
           <Text className={styles.actionBtnText}>返回</Text>
         </View>
-        <View
-          className={classnames(styles.actionBtn, styles.primary)}
-          onClick={() => setShowAnnotateModal(true)}
-        >
-          <Text className={styles.actionBtnText}>添加圈选备注</Text>
-        </View>
+        {role === 'customer' ? (
+          <View
+            className={classnames(styles.actionBtn, styles.primary)}
+            onClick={() => setShowAnnotateModal(true)}
+          >
+            <Text className={styles.actionBtnText}>添加圈选备注</Text>
+          </View>
+        ) : (
+          <View
+            className={classnames(styles.actionBtn, styles.primary)}
+            onClick={openDoctorNoteModal}
+          >
+            <Text className={styles.actionBtnText}>写专业建议</Text>
+          </View>
+        )}
       </View>
 
       {showAnnotateModal && (
@@ -220,6 +293,32 @@ const PhotoDetailPage = () => {
                 </View>
               </>
             )}
+          </View>
+        </View>
+      )}
+
+      {showDoctorNoteModal && (
+        <View className={styles.annotateModal} onClick={() => setShowDoctorNoteModal(false)}>
+          <View className={styles.annotateContent} onClick={e => e.stopPropagation()}>
+            <Text className={styles.annotateTitle}>医生专业建议</Text>
+            <Textarea
+              className={styles.doctorNoteTextarea}
+              placeholder='请输入您的专业建议...'
+              value={doctorNoteText}
+              onInput={e => setDoctorNoteText(e.detail.value)}
+              maxlength={500}
+            />
+            <Text className={styles.annotateDesc}>
+              建议将保存后，顾客可在照片详情中查看
+            </Text>
+            <View className={styles.annotateActions}>
+              <View className={classnames(styles.annotateBtn, styles.cancel)} onClick={() => setShowDoctorNoteModal(false)}>
+                <Text className={styles.annotateBtnText}>取消</Text>
+              </View>
+              <View className={classnames(styles.annotateBtn, styles.confirm)} onClick={handleSaveDoctorNote}>
+                <Text className={styles.annotateBtnText}>保存建议</Text>
+              </View>
+            </View>
           </View>
         </View>
       )}
