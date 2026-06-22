@@ -2,11 +2,13 @@ import React, { useState, useMemo } from 'react'
 import { View, Text, Image, Input, Textarea } from '@tarojs/components'
 import { useAppStore } from '@/store/index'
 import { useRouter } from '@tarojs/taro'
+import { DoctorAdviceType, DoctorAdviceLabels } from '@/types/index'
 import styles from './index.module.scss'
 import classnames from 'classnames'
 import Taro from '@tarojs/taro'
 
 const feelingLabels = ['很差', '较差', '一般', '良好', '很好']
+const adviceTypes: DoctorAdviceType[] = ['observe', 'followup', 'care']
 
 const PhotoDetailPage = () => {
   const router = useRouter()
@@ -17,6 +19,7 @@ const PhotoDetailPage = () => {
   const setPhotoVisibleToDoctor = useAppStore(s => s.setPhotoVisibleToDoctor)
   const addAnnotation = useAppStore(s => s.addAnnotation)
   const setDoctorNote = useAppStore(s => s.setDoctorNote)
+  const createFollowupReminder = useAppStore(s => s.createFollowupReminder)
 
   const photo = useMemo(() => photos.find(p => p.id === photoId), [photos, photoId])
 
@@ -24,6 +27,7 @@ const PhotoDetailPage = () => {
   const [pendingPoint, setPendingPoint] = useState<{ x: number; y: number } | null>(null)
   const [annotationText, setAnnotationText] = useState('')
   const [doctorNoteText, setDoctorNoteText] = useState('')
+  const [doctorAdviceType, setDoctorAdviceType] = useState<DoctorAdviceType>('observe')
   const [showDoctorNoteModal, setShowDoctorNoteModal] = useState(false)
 
   if (!photo) {
@@ -46,7 +50,6 @@ const PhotoDetailPage = () => {
       setPendingPoint({ x: Math.max(5, Math.min(95, x)), y: Math.max(5, Math.min(95, y)) })
       setAnnotationText('')
       setShowAnnotateModal(true)
-      console.info('[PhotoDetail] annotate at', { x: Math.max(5, Math.min(95, x)), y: Math.max(5, Math.min(95, y)) })
     }
   }
 
@@ -76,6 +79,7 @@ const PhotoDetailPage = () => {
 
   const openDoctorNoteModal = () => {
     setDoctorNoteText(photo.doctorNote || '')
+    setDoctorAdviceType(photo.doctorAdviceType || 'observe')
     setShowDoctorNoteModal(true)
   }
 
@@ -84,9 +88,26 @@ const PhotoDetailPage = () => {
       Taro.showToast({ title: '请输入专业建议', icon: 'none' })
       return
     }
-    setDoctorNote(photo.id, doctorNoteText.trim())
+    setDoctorNote(photo.id, doctorNoteText.trim(), doctorAdviceType)
     setShowDoctorNoteModal(false)
     Taro.showToast({ title: '已保存建议', icon: 'success' })
+  }
+
+  const handleCreateReminder = () => {
+    Taro.showModal({
+      title: '生成复诊提醒',
+      content: '将为顾客生成一条 7 天后的复诊提醒，顾客会在护理提醒中看到。是否继续？',
+      confirmText: '生成',
+      cancelText: '取消',
+      success: (res) => {
+        if (res.confirm) {
+          const r = createFollowupReminder(photo.id)
+          if (r) {
+            Taro.showToast({ title: '已生成提醒', icon: 'success' })
+          }
+        }
+      }
+    })
   }
 
   const handleTogglePrivate = () => {
@@ -109,6 +130,14 @@ const PhotoDetailPage = () => {
     }
   }
 
+  const handleToggleVisibleToDoctor = () => {
+    if (photo.isPrivate) {
+      Taro.showToast({ title: '私密照片不能开放给医生', icon: 'none' })
+      return
+    }
+    setPhotoVisibleToDoctor(photo.id, !photo.visibleToDoctor)
+  }
+
   return (
     <View className={styles.page}>
       <View className={styles.photoSection}>
@@ -125,13 +154,23 @@ const PhotoDetailPage = () => {
               <Text className={styles.metaTagText}>仅自己可见</Text>
             </View>
           )}
+          {photo.doctorAdviceType && (
+            <View className={classnames(styles.metaTag, styles.advice)}>
+              <Text className={styles.metaTagText}>
+                {doctorAdviceType === 'observe' && '🔍'}
+                {doctorAdviceType === 'followup' && '🏥'}
+                {doctorAdviceType === 'care' && '💆'}
+                {' '}{DoctorAdviceLabels[photo.doctorAdviceType]}
+              </Text>
+            </View>
+          )}
         </View>
         <View className={styles.imageWrap} onTouchStart={handleImageTouch}>
           <Image className={styles.bigImage} src={photo.imageUrl} mode='aspectFill' />
           {photo.annotations.map((ann, idx) => (
             <React.Fragment key={ann.id}>
               <View
-                className={classnames(styles.annotationCircle, pendingPoint && pendingPoint.x === ann.x && pendingPoint.y === ann.y && styles.editing)}
+                className={classnames(styles.annotationCircle)}
                 style={{ left: `${ann.x}%`, top: `${ann.y}%`, width: `${ann.radius * 6}rpx`, height: `${ann.radius * 6}rpx` }}
               />
               <View className={styles.annotationLabel} style={{ left: `${ann.x}%`, top: `${ann.y}%` }}>
@@ -175,7 +214,14 @@ const PhotoDetailPage = () => {
       {photo.doctorNote && (
         <View className={classnames(styles.section, styles.doctorSection)}>
           <View className={styles.doctorSectionHeader}>
-            <Text className={styles.sectionTitle}>👩‍⚕️ 医生专业建议</Text>
+            <Text className={styles.sectionTitle}>
+              👩‍⚕️ 医生专业建议
+              {photo.doctorAdviceType && (
+                <Text className={styles.doctorAdviceTag}>
+                  · {DoctorAdviceLabels[photo.doctorAdviceType]}
+                </Text>
+              )}
+            </Text>
             {photo.doctorNoteAt && (
               <Text className={styles.doctorNoteTime}>{photo.doctorNoteAt}</Text>
             )}
@@ -194,6 +240,11 @@ const PhotoDetailPage = () => {
               {photo.doctorNote || '点击此处为这张照片写专业建议...'}
             </Text>
           </View>
+          {photo.doctorAdviceType === 'followup' && (
+            <View className={styles.doctorActionBtn} onClick={handleCreateReminder}>
+              <Text className={styles.doctorActionBtnText}>➕ 一键生成复诊提醒给顾客</Text>
+            </View>
+          )}
         </View>
       )}
 
@@ -226,10 +277,19 @@ const PhotoDetailPage = () => {
             </View>
           </View>
           <View className={styles.privacyRow}>
-            <Text className={styles.privacyLabel}>允许医生/咨询师查看</Text>
+            <View className={styles.privacyLabelWrap}>
+              <Text className={styles.privacyLabel}>允许医生/咨询师查看</Text>
+              {photo.isPrivate && (
+                <Text className={styles.privacyDisabledHint}>（私密照片不可开放）</Text>
+              )}
+            </View>
             <View
-              className={classnames(styles.privacyToggle, photo.visibleToDoctor && styles.on)}
-              onClick={() => setPhotoVisibleToDoctor(photo.id, !photo.visibleToDoctor)}
+              className={classnames(
+                styles.privacyToggle,
+                photo.visibleToDoctor && !photo.isPrivate && styles.on,
+                photo.isPrivate && styles.disabled
+              )}
+              onClick={handleToggleVisibleToDoctor}
             >
               <View className={styles.privacyToggleKnob} />
             </View>
@@ -301,6 +361,23 @@ const PhotoDetailPage = () => {
         <View className={styles.annotateModal} onClick={() => setShowDoctorNoteModal(false)}>
           <View className={styles.annotateContent} onClick={e => e.stopPropagation()}>
             <Text className={styles.annotateTitle}>医生专业建议</Text>
+            <Text className={styles.annotateLabel}>建议类型</Text>
+            <View className={styles.adviceTypeRow}>
+              {adviceTypes.map(t => (
+                <View
+                  key={t}
+                  className={classnames(styles.adviceTypeChip, doctorAdviceType === t && styles.active)}
+                  onClick={() => setDoctorAdviceType(t)}
+                >
+                  <Text className={styles.adviceTypeIcon}>
+                    {t === 'observe' && '🔍'}
+                    {t === 'followup' && '🏥'}
+                    {t === 'care' && '💆'}
+                  </Text>
+                  <Text className={styles.adviceTypeText}>{DoctorAdviceLabels[t]}</Text>
+                </View>
+              ))}
+            </View>
             <Textarea
               className={styles.doctorNoteTextarea}
               placeholder='请输入您的专业建议...'
@@ -309,7 +386,7 @@ const PhotoDetailPage = () => {
               maxlength={500}
             />
             <Text className={styles.annotateDesc}>
-              建议将保存后，顾客可在照片详情中查看
+              建议保存后顾客可在照片详情中查看；选"需要复诊"可额外生成复诊提醒
             </Text>
             <View className={styles.annotateActions}>
               <View className={classnames(styles.annotateBtn, styles.cancel)} onClick={() => setShowDoctorNoteModal(false)}>

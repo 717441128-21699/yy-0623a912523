@@ -1,13 +1,15 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { View, Text, ScrollView } from '@tarojs/components'
-import { reminders as initialReminders } from '@/data/reminders'
+import { useAppStore } from '@/store/index'
 import ReminderCard from '@/components/ReminderCard'
 import styles from './index.module.scss'
 import classnames from 'classnames'
 import Taro from '@tarojs/taro'
 
 const ReminderPage = () => {
-  const [reminderList, setReminderList] = useState(initialReminders)
+  const reminders = useAppStore(s => s.reminders)
+  const toggleReminder = useAppStore(s => s.toggleReminder)
+
   const [activeFilter, setActiveFilter] = useState('全部')
   const filters = ['全部', '防晒', '补水', '忌口', '复诊', '用药']
 
@@ -22,25 +24,28 @@ const ReminderPage = () => {
 
   const pendingReminders = useMemo(() => {
     const filterType = filterTypeMap[activeFilter]
-    return reminderList.filter(r => {
-      if (r.isCompleted) return false
-      if (filterType && r.type !== filterType) return false
-      return true
-    })
-  }, [reminderList, activeFilter])
+    return reminders
+      .filter(r => !r.isCompleted)
+      .filter(r => !filterType || r.type === filterType)
+      .sort((a, b) => a.date.localeCompare(b.date))
+  }, [reminders, activeFilter])
 
   const completedReminders = useMemo(() => {
     const filterType = filterTypeMap[activeFilter]
-    return reminderList.filter(r => {
-      if (!r.isCompleted) return false
-      if (filterType && r.type !== filterType) return false
-      return true
-    })
-  }, [reminderList, activeFilter])
+    return reminders
+      .filter(r => r.isCompleted)
+      .filter(r => !filterType || r.type === filterType)
+      .sort((a, b) => b.date.localeCompare(a.date))
+  }, [reminders, activeFilter])
+
+  const doctorPendingCount = useMemo(
+    () => pendingReminders.filter(r => r.fromDoctor).length,
+    [pendingReminders]
+  )
 
   const handleToggle = useCallback((id: string) => {
-    setReminderList(prev => prev.map(r => r.id === id ? { ...r, isCompleted: !r.isCompleted } : r))
-  }, [])
+    toggleReminder(id)
+  }, [toggleReminder])
 
   const handleAbnormal = () => {
     Taro.navigateTo({ url: '/pages/message/index?type=abnormal' })
@@ -52,6 +57,15 @@ const ReminderPage = () => {
         <Text className={styles.title}>护理提醒</Text>
         <Text className={styles.desc}>按时护理，恢复更佳</Text>
       </View>
+
+      {doctorPendingCount > 0 && (
+        <View className={styles.doctorTip}>
+          <Text className={styles.doctorTipIcon}>👩‍⚕️</Text>
+          <Text className={styles.doctorTipText}>
+            您有 {doctorPendingCount} 条来自医生的提醒待处理
+          </Text>
+        </View>
+      )}
 
       <ScrollView className={styles.filterRow} scrollX>
         {filters.map(filter => (

@@ -229,4 +229,16 @@
   font-size: $font-size-sm;
   color: $color-text-primary;
   font-weight: $font-weight-medium;
+
+  &.expired {
+    color: #D06060;
+  }
+
+  &.active {
+    color: #4A9570;
+  }
+
+  &.authFlag {
+    color: #4A9570;
+  }
 }

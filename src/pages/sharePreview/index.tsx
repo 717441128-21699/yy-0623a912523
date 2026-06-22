@@ -3,7 +3,9 @@ import { View, Text, Image, ScrollView } from '@tarojs/components'
 import { useRouter } from '@tarojs/taro'
 import { treatments } from '@/data/treatments'
 import { useAppStore } from '@/store/index'
-import { ShareTemplate } from '@/types/index'
+import {
+  ShareTemplate, ShareTarget, ShareValidDays, ShareTargetLabels
+} from '@/types/index'
 import styles from './index.module.scss'
 import classnames from 'classnames'
 import Taro from '@tarojs/taro'
@@ -14,15 +16,26 @@ const templateLabels: Record<ShareTemplate, string> = {
   summary: '仅摘要'
 }
 
+const validDaysOptions: ShareValidDays[] = [7, 30]
+const targetOptions: ShareTarget[] = ['self', 'doctor', 'family']
+const targetIcons: Record<ShareTarget, string> = {
+  self: '🙋',
+  doctor: '👩‍⚕️',
+  family: '👨‍👩‍👧'
+}
+
 const SharePreviewPage = () => {
   const router = useRouter()
   const treatmentId = router.params.treatmentId || ''
   const templateParam = (router.params.template as ShareTemplate) || 'compare'
+  const authorizedParam = router.params.authorized === '1'
   const photos = useAppStore(s => s.photos)
   const addShareRecord = useAppStore(s => s.addShareRecord)
   const treatment = treatments.find(t => t.id === treatmentId)
 
   const [template, setTemplate] = useState<ShareTemplate>(templateParam)
+  const [target, setTarget] = useState<ShareTarget>('self')
+  const [validDays, setValidDays] = useState<ShareValidDays>(7)
 
   const publicPhotos = useMemo(() => {
     return photos
@@ -63,9 +76,14 @@ const SharePreviewPage = () => {
       template,
       previewImage: previewImg,
       summary: summaryText,
-      photoCount: publicPhotos.length
+      photoCount: publicPhotos.length,
+      target,
+      validDays,
+      authorized: authorizedParam
     })
-    console.info('[SharePreview] saved share record', { template, count: publicPhotos.length })
+    console.info('[SharePreview] saved share record', {
+      template, target, validDays, authorized: authorizedParam, count: publicPhotos.length
+    })
     Taro.showToast({ title: '已保存分享图', icon: 'success' })
     setTimeout(() => Taro.navigateBack(), 800)
   }
@@ -128,6 +146,12 @@ const SharePreviewPage = () => {
           <Text className={styles.previewLogo}>· 美丽成长册 ·</Text>
         </View>
         <Text className={styles.previewSubTitle}>{treatment?.name || '疗程恢复记录'}</Text>
+
+        {authorizedParam && (
+          <View className={styles.authTag}>
+            <Text className={styles.authTagText}>✓ 本次已授权生成</Text>
+          </View>
+        )}
 
         {privateCount > 0 && template !== 'summary' && (
           <View className={styles.privacyHint}>
@@ -217,6 +241,41 @@ const SharePreviewPage = () => {
         <View className={styles.footerBrand}>
           <Text className={styles.footerBrandText}>美丽成长册 · 记录每一次蜕变</Text>
           <Text className={styles.footerBrandSub}>图片仅包含已授权公开内容</Text>
+        </View>
+      </View>
+
+      <View className={styles.optionsSection}>
+        <Text className={styles.optionsTitle}>分享设置</Text>
+
+        <View className={styles.optionRow}>
+          <Text className={styles.optionLabel}>发送对象</Text>
+          <View className={styles.chipGroup}>
+            {targetOptions.map(t => (
+              <View
+                key={t}
+                className={classnames(styles.chip, target === t && styles.active)}
+                onClick={() => setTarget(t)}
+              >
+                <Text className={styles.chipIcon}>{targetIcons[t]}</Text>
+                <Text className={styles.chipText}>{ShareTargetLabels[t]}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+
+        <View className={styles.optionRow}>
+          <Text className={styles.optionLabel}>有效期</Text>
+          <View className={styles.chipGroup}>
+            {validDaysOptions.map(d => (
+              <View
+                key={d}
+                className={classnames(styles.chip, validDays === d && styles.active)}
+                onClick={() => setValidDays(d)}
+              >
+                <Text className={styles.chipText}>{d} 天有效</Text>
+              </View>
+            ))}
+          </View>
         </View>
       </View>
 

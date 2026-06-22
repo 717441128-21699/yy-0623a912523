@@ -13,6 +13,7 @@ const feelingLabels = ['很差', '较差', '一般', '良好', '很好']
 const CheckinPage = () => {
   const addPhoto = useAppStore(s => s.addPhoto)
   const defaultPrivate = useAppStore(s => s.defaultPrivate)
+  const doctorVisible = useAppStore(s => s.doctorVisible)
 
   const [selectedTemplate, setSelectedTemplate] = useState('a1')
   const [selectedTreatment, setSelectedTreatment] = useState(activeTreatments[0]?.id || '')
@@ -25,6 +26,12 @@ const CheckinPage = () => {
   useEffect(() => {
     setIsPrivate(defaultPrivate)
   }, [defaultPrivate])
+
+  useEffect(() => {
+    if (isPrivate && visibleToDoctor) {
+      setVisibleToDoctor(false)
+    }
+  }, [isPrivate, visibleToDoctor])
 
   const handleChooseImage = async () => {
     try {
@@ -45,6 +52,25 @@ const CheckinPage = () => {
   const handleRetake = (e) => {
     e.stopPropagation()
     setCapturedImage('')
+  }
+
+  const handleTogglePrivate = (nextVal: boolean) => {
+    setIsPrivate(nextVal)
+    if (nextVal) {
+      setVisibleToDoctor(false)
+    }
+  }
+
+  const handleToggleVisibleToDoctor = () => {
+    if (isPrivate) {
+      Taro.showToast({ title: '私密照片不可开放给医生', icon: 'none' })
+      return
+    }
+    if (!doctorVisible) {
+      Taro.showToast({ title: '总开关已关闭医生可见性', icon: 'none' })
+      return
+    }
+    setVisibleToDoctor(!visibleToDoctor)
   }
 
   const handleSubmit = () => {
@@ -69,7 +95,7 @@ const CheckinPage = () => {
       imageUrl: capturedImage,
       angle: tpl?.name || '',
       isPrivate,
-      visibleToDoctor,
+      visibleToDoctor: isPrivate ? false : visibleToDoctor,
       notes,
       feeling: feelingLabels[feelingScore - 1],
       feelingScore
@@ -81,11 +107,14 @@ const CheckinPage = () => {
     setFeelingScore(3)
     setCapturedImage('')
     setIsPrivate(defaultPrivate)
+    setVisibleToDoctor(true)
 
     setTimeout(() => {
       Taro.switchTab({ url: '/pages/compare/index' })
     }, 800)
   }
+
+  const doctorVisibleDisabled = isPrivate || !doctorVisible
 
   return (
     <ScrollView className={styles.page} scrollY>
@@ -158,16 +187,27 @@ const CheckinPage = () => {
             <Text className={styles.privacyLabel}>仅自己可见</Text>
             <View
               className={classnames(styles.privacyToggle, isPrivate && styles.on)}
-              onClick={() => setIsPrivate(!isPrivate)}
+              onClick={() => handleTogglePrivate(!isPrivate)}
             >
               <View className={styles.privacyToggleKnob} />
             </View>
           </View>
           <View className={styles.privacyRow}>
-            <Text className={styles.privacyLabel}>允许医生/咨询师查看</Text>
+            <View className={styles.privacyLabelWrap}>
+              <Text className={styles.privacyLabel}>允许医生/咨询师查看</Text>
+              {doctorVisibleDisabled && (
+                <Text className={styles.privacyDisabledHint}>
+                  {isPrivate ? '（私密照片不可开放）' : '（总开关已关闭）'}
+                </Text>
+              )}
+            </View>
             <View
-              className={classnames(styles.privacyToggle, visibleToDoctor && styles.on)}
-              onClick={() => setVisibleToDoctor(!visibleToDoctor)}
+              className={classnames(
+                styles.privacyToggle,
+                visibleToDoctor && !doctorVisibleDisabled && styles.on,
+                doctorVisibleDisabled && styles.disabled
+              )}
+              onClick={handleToggleVisibleToDoctor}
             >
               <View className={styles.privacyToggleKnob} />
             </View>

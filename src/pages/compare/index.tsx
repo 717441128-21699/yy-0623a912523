@@ -2,7 +2,9 @@ import React, { useState, useMemo } from 'react'
 import { View, Text, ScrollView, Picker } from '@tarojs/components'
 import { treatments } from '@/data/treatments'
 import { useAppStore } from '@/store/index'
-import { ShareTemplate } from '@/types/index'
+import {
+  ShareTemplate, ShareTarget, ShareTargetLabels
+} from '@/types/index'
 import CompareSlider from '@/components/CompareSlider'
 import PhotoTimeline from '@/components/PhotoTimeline'
 import styles from './index.module.scss'
@@ -15,11 +17,31 @@ const templateLabels: Record<ShareTemplate, string> = {
   summary: '仅变化摘要'
 }
 
+const targetIcons: Record<ShareTarget, string> = {
+  self: '🙋',
+  doctor: '👩‍⚕️',
+  family: '👨‍👩‍👧'
+}
+
+const isExpired = (createdAt: string, days: number) => {
+  const created = new Date(createdAt.replace(/-/g, '/')).getTime()
+  const now = Date.now()
+  return now - created > days * 24 * 60 * 60 * 1000
+}
+
+const expireOn = (createdAt: string, days: number) => {
+  const created = new Date(createdAt.replace(/-/g, '/')).getTime()
+  const d = new Date(created + days * 24 * 60 * 60 * 1000)
+  const pad = (n: number) => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`
+}
+
 const ComparePage = () => {
   const photos = useAppStore(s => s.photos)
   const shareAuth = useAppStore(s => s.shareAuth)
   const role = useAppStore(s => s.role)
   const shareRecords = useAppStore(s => s.shareRecords)
+  const doctorVisible = useAppStore(s => s.doctorVisible)
 
   const treatmentIds = useMemo(() => [...new Set(photos.map(p => p.treatmentId))], [photos])
   const treatmentOptions = treatments.filter(t => treatmentIds.includes(t.id))
@@ -28,10 +50,14 @@ const ComparePage = () => {
   const treatmentPhotos = useMemo(() => {
     let list = photos.filter(p => p.treatmentId === selectedTreatment)
     if (role === 'doctor') {
-      list = list.filter(p => !p.isPrivate && p.visibleToDoctor)
+      if (!doctorVisible) {
+        list = []
+      } else {
+        list = list.filter(p => !p.isPrivate && p.visibleToDoctor)
+      }
     }
     return list.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-  }, [selectedTreatment, photos, role])
+  }, [selectedTreatment, photos, role, doctorVisible])
 
   const comparePair = useMemo(() => {
     if (treatmentPhotos.length < 2) return null
@@ -45,14 +71,26 @@ const ComparePage = () => {
     return shareRecords.find(s => s.treatmentId === selectedTreatment)
   }, [shareRecords, selectedTreatment])
 
-  const goSharePreview = (template: ShareTemplate) => {
+  const goSharePreview = (template: ShareTemplate, authorized: boolean) => {
+    const authParam = authorized ? '&authorized=1' : ''
     Taro.navigateTo({
-      url: `/pages/sharePreview/index?treatmentId=${selectedTreatment}&template=${template}`
+      url: `/pages/sharePreview/index?treatmentId=${selectedTreatment}&template=${template}${authParam}`
     })
   }
 
   const handleShare = () => {
-    if (!shareAuth) {
+    const requestAuth = shareAuth
+    const proceed = (authorized: boolean) => {
+      Taro.showActionSheet({
+        itemList: ['前后对比图', '完整时间线', '仅变化摘要'],
+        success: (res) => {
+          const templates: ShareTemplate[] = ['compare', 'timeline', 'summary']
+          goSharePreview(templates[res.tapIndex], authorized)
+        }
+      })
+    }
+
+    if (requestAuth) {
       Taro.showModal({
         title: '隐私授权确认',
         content: '生成分享图前，请确认您同意将照片用于分享。系统将仅展示您同意公开的照片，私密照片不会被包含。',
@@ -61,23 +99,13 @@ const ComparePage = () => {
         success: (res) => {
           if (res.confirm) {
             console.info('[Compare] share authorized')
-            showTemplatePicker()
+            proceed(true)
           }
         }
       })
       return
     }
-    showTemplatePicker()
-  }
-
-  const showTemplatePicker = () => {
-    Taro.showActionSheet({
-      itemList: ['前后对比图', '完整时间线', '仅变化摘要'],
-      success: (res) => {
-        const templates: ShareTemplate[] = ['compare', 'timeline', 'summary']
-        goSharePreview(templates[res.tapIndex])
-      }
-    })
+    proceed(false)
   }
 
   return (
@@ -92,7 +120,7 @@ const ComparePage = () => {
           )}
         </View>
         <Text className={styles.subtitle}>
-          {role === 'doctor' ? '仅展示授权可见的照片' : '看见每一份变化'}
+          {role === 'doctor' ? (doctorVisible ? '仅展示授权可见的照片' : '顾客已关闭对医生的可见性') : '看见每一份变化'}
         </Text>
       </View>
 
@@ -140,7 +168,7 @@ const ComparePage = () => {
                 </Text>
               </View>
             )}
-            {role === 'doctor' && (
+            {role === 'doctor' && doctorVisible && (
               <View className={styles.summaryItem}>
                 <View className={styles.summaryDot} />
                 <Text className={styles.summaryText}>
@@ -160,6 +188,12 @@ const ComparePage = () => {
           </View>
           <View className={styles.shareRecordBody}>
             <View className={styles.shareRecordInfo}>
+              <Text className={styles.shareRecordLabel}>对象</Text>
+              <Text className={styles.shareRecordValue}>
+                {targetIcons[lastShare.target]} {ShareTargetLabels[lastShare.target]}
+              </Text>
+            </View>
+            <View className={styles.shareRecordInfo}>
               <Text className={styles.shareRecordLabel}>模板</Text>
               <Text className={styles.shareRecordValue}>{templateLabels[lastShare.template]}</Text>
             </View>
@@ -167,6 +201,35 @@ const ComparePage = () => {
               <Text className={styles.shareRecordLabel}>照片数</Text>
               <Text className={styles.shareRecordValue}>{lastShare.photoCount} 张</Text>
             </View>
+            <View className={styles.shareRecordInfo}>
+              <Text className={styles.shareRecordLabel}>有效期</Text>
+              <Text className={classnames(
+                styles.shareRecordValue,
+                isExpired(lastShare.createdAt, lastShare.validDays) && styles.expired
+              )}>
+                {lastShare.validDays} 天有效
+              </Text>
+            </View>
+            <View className={styles.shareRecordInfo}>
+              <Text className={styles.shareRecordLabel}>状态</Text>
+              {isExpired(lastShare.createdAt, lastShare.validDays) ? (
+                <Text className={classnames(styles.shareRecordValue, styles.expired)}>
+                  ⨯ 已过期（{expireOn(lastShare.createdAt, lastShare.validDays)}）
+                </Text>
+              ) : (
+                <Text className={classnames(styles.shareRecordValue, styles.active)}>
+                  ✓ 有效（至 {expireOn(lastShare.createdAt, lastShare.validDays)}）
+                </Text>
+              )}
+            </View>
+            {lastShare.authorized && (
+              <View className={styles.shareRecordInfo}>
+                <Text className={styles.shareRecordLabel}>授权</Text>
+                <Text className={classnames(styles.shareRecordValue, styles.authFlag)}>
+                  ✓ 本次已确认授权
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       )}
@@ -185,7 +248,9 @@ const ComparePage = () => {
         ) : (
           <View className={styles.emptyWrap}>
             <Text className={styles.emptyText}>
-              {role === 'doctor' ? '暂无授权可见的照片' : '暂无照片记录'}
+              {role === 'doctor'
+                ? (doctorVisible ? '暂无授权可见的照片' : '顾客已关闭对医生的可见性')
+                : '暂无照片记录'}
             </Text>
           </View>
         )}

@@ -12,6 +12,14 @@ export interface Treatment {
   startDate: string;
 }
 
+export type DoctorAdviceType = 'observe' | 'followup' | 'care';
+
+export const DoctorAdviceLabels: Record<DoctorAdviceType, string> = {
+  observe: '继续观察',
+  followup: '需要复诊',
+  care: '护理注意'
+};
+
 export interface PhotoRecord {
   id: string;
   treatmentId: string;
@@ -27,11 +35,21 @@ export interface PhotoRecord {
   annotations: PhotoAnnotation[];
   doctorNote?: string;
   doctorNoteAt?: string;
+  doctorAdviceType?: DoctorAdviceType;
 }
 
 export type UserRole = 'customer' | 'doctor';
 
 export type ShareTemplate = 'compare' | 'timeline' | 'summary';
+
+export type ShareTarget = 'self' | 'doctor' | 'family';
+export type ShareValidDays = 7 | 30;
+
+export const ShareTargetLabels: Record<ShareTarget, string> = {
+  self: '发给自己',
+  doctor: '发给医生',
+  family: '发给家人'
+};
 
 export interface ShareRecord {
   id: string;
@@ -42,6 +60,9 @@ export interface ShareRecord {
   summary: string;
   createdAt: string;
   photoCount: number;
+  target: ShareTarget;
+  validDays: ShareValidDays;
+  authorized: boolean;
 }
 
 export interface PhotoAnnotation {
@@ -62,6 +83,9 @@ export interface Reminder {
   date: string;
   time: string;
   isCompleted: boolean;
+  fromDoctor?: boolean;
+  relatedPhotoId?: string;
+  relatedPhotoUrl?: string;
 }
 
 export interface Message {
