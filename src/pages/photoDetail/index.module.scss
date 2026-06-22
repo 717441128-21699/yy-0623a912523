@@ -3,23 +3,385 @@
 .page {
   min-height: 100vh;
   background: $color-bg-page;
-  @include flex-center;
-  flex-direction: column;
+  padding-bottom: 140rpx;
 }
 
-.placeholderIcon {
-  font-size: 80rpx;
+.photoSection {
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
   margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
 }
 
-.placeholderTitle {
-  font-size: $font-size-lg;
+.metaRow {
+  display: flex;
+  align-items: center;
+  margin-bottom: $spacing-sm;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.metaTag {
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+  background: $color-tag-bg;
+}
+
+.metaTagText {
+  font-size: $font-size-xs;
+  color: $color-tag-text;
+  white-space: nowrap;
+}
+
+.metaTag.private {
+  background: rgba(155, 139, 152, 0.12);
+  .metaTagText {
+    color: $color-text-tertiary;
+  }
+}
+
+.metaDate {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+  margin-right: auto;
+}
+
+.imageWrap {
+  position: relative;
+  width: 100%;
+  border-radius: $radius-md;
+  overflow: hidden;
+  background: #000;
+  min-height: 500rpx;
+  user-select: none;
+  touch-action: none;
+}
+
+.bigImage {
+  width: 100%;
+  height: 500rpx;
+  pointer-events: none;
+}
+
+.annotationCircle {
+  position: absolute;
+  border: 4rpx solid $color-primary;
+  border-radius: $radius-round;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  box-shadow: 0 0 0 2rpx rgba(255, 255, 255, 0.4);
+}
+
+.annotationCircle.editing {
+  border-color: $color-error;
+  box-shadow: 0 0 12rpx rgba(224, 128, 128, 0.6), 0 0 0 2rpx rgba(255, 255, 255, 0.5);
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { box-shadow: 0 0 12rpx rgba(224, 128, 128, 0.6), 0 0 0 2rpx rgba(255, 255, 255, 0.5); }
+  50% { box-shadow: 0 0 24rpx rgba(224, 128, 128, 0.9), 0 0 0 2rpx rgba(255, 255, 255, 0.6); }
+}
+
+.annotationLabel {
+  position: absolute;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: $font-size-xs;
+  padding: 2rpx 10rpx;
+  border-radius: $radius-sm;
+  transform: translate(-50%, calc(-100% - 28rpx));
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.section {
+  margin: $spacing-md $page-padding;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.sectionTitle {
+  font-size: $font-size-md;
   font-weight: $font-weight-semibold;
   color: $color-text-primary;
   margin-bottom: $spacing-sm;
 }
 
-.placeholderDesc {
+.feelingRow {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+}
+
+.feelingDots {
+  display: flex;
+  gap: 8rpx;
+}
+
+.feelingDot {
+  width: 24rpx;
+  height: 24rpx;
+  border-radius: $radius-round;
+  background: $color-border;
+
+  &.active {
+    background: $color-primary;
+  }
+}
+
+.feelingText {
   font-size: $font-size-md;
+  color: $color-text-secondary;
+}
+
+.notesText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+}
+
+.notesEmpty {
+  font-size: $font-size-md;
+  color: $color-text-disabled;
+}
+
+.annotationList {
+  margin-top: $spacing-sm;
+}
+
+.annotationItem {
+  display: flex;
+  align-items: flex-start;
+  padding: $spacing-sm 0;
+
+  & + & {
+    border-top: 1rpx solid $color-divider;
+  }
+}
+
+.annotationIndex {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  @include flex-center;
+  margin-right: $spacing-sm;
+  flex-shrink: 0;
+}
+
+.annotationIndexText {
+  font-size: $font-size-xs;
+  color: #ffffff;
+  font-weight: $font-weight-semibold;
+}
+
+.annotationNote {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  flex: 1;
+  line-height: $line-height-normal;
+}
+
+.annotationDelete {
+  font-size: $font-size-xs;
+  color: $color-error;
+  margin-left: $spacing-sm;
+  padding: $spacing-xs;
+}
+
+.privacySection {
+  margin: $spacing-md $page-padding;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.privacyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm 0;
+
+  & + & {
+    border-top: 1rpx solid $color-divider;
+  }
+}
+
+.privacyLabel {
+  font-size: $font-size-md;
+  color: $color-text-primary;
+}
+
+.privacyToggle {
+  width: 80rpx;
+  height: 44rpx;
+  border-radius: $radius-round;
+  background: $color-border;
+  position: relative;
+  transition: all $transition-base;
+  flex-shrink: 0;
+
+  &.on {
+    background: $color-primary;
+  }
+}
+
+.privacyToggleKnob {
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: $radius-round;
+  background: #ffffff;
+  position: absolute;
+  top: 4rpx;
+  left: 4rpx;
+  transition: all $transition-base;
+  box-shadow: 0 1rpx 4rpx rgba(0, 0, 0, 0.1);
+
+  .on & {
+    left: 40rpx;
+  }
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  z-index: 100;
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.actionBtn {
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  @include flex-center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+
+  &.ghost {
+    background: $color-bg-hover;
+    .actionBtnText {
+      color: $color-text-secondary;
+    }
+  }
+
+  &.primary {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+    .actionBtnText {
+      color: #ffffff;
+    }
+  }
+
+  &.warning {
+    background: linear-gradient(135deg, $color-error 0%, #F0A0A0 100%);
+    .actionBtnText {
+      color: #ffffff;
+    }
+  }
+}
+
+.actionBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
+}
+
+.annotateModal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 200;
+  @include flex-center;
+}
+
+.annotateContent {
+  width: 580rpx;
+  background: $color-bg-card;
+  border-radius: $radius-xl;
+  padding: $spacing-lg;
+  box-shadow: $shadow-popup;
+}
+
+.annotateTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  text-align: center;
+  margin-bottom: $spacing-md;
+}
+
+.annotateDesc {
+  font-size: $font-size-sm;
   color: $color-text-tertiary;
+  text-align: center;
+  margin-bottom: $spacing-md;
+  line-height: $line-height-loose;
+}
+
+.annotateInput {
+  width: 100%;
+  min-height: 120rpx;
+  background: $color-bg-hover;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  font-size: $font-size-md;
+  color: $color-text-primary;
+  line-height: $line-height-loose;
+  box-sizing: border-box;
+  border: none;
+  margin-bottom: $spacing-lg;
+}
+
+.annotateActions {
+  display: flex;
+  gap: $spacing-md;
+}
+
+.annotateBtn {
+  flex: 1;
+  height: $button-height-md;
+  border-radius: $radius-button;
+  @include flex-center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+  }
+
+  &.cancel {
+    background: $color-bg-hover;
+    .annotateBtnText {
+      color: $color-text-secondary;
+    }
+  }
+
+  &.confirm {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+    .annotateBtnText {
+      color: #ffffff;
+    }
+  }
+}
+
+.annotateBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  white-space: nowrap;
 }

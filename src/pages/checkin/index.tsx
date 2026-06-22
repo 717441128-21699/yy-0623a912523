@@ -1,30 +1,90 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, ScrollView, Input, Image } from '@tarojs/components'
 import { angleTemplates } from '@/data/photos'
 import { treatments } from '@/data/treatments'
+import { useAppStore } from '@/store/index'
 import styles from './index.module.scss'
 import classnames from 'classnames'
 import Taro from '@tarojs/taro'
 
 const activeTreatments = treatments.filter(t => t.status === 'active')
+const feelingLabels = ['很差', '较差', '一般', '良好', '很好']
 
 const CheckinPage = () => {
+  const addPhoto = useAppStore(s => s.addPhoto)
+  const defaultPrivate = useAppStore(s => s.defaultPrivate)
+
   const [selectedTemplate, setSelectedTemplate] = useState('a1')
   const [selectedTreatment, setSelectedTreatment] = useState(activeTreatments[0]?.id || '')
-  const [isPrivate, setIsPrivate] = useState(false)
+  const [isPrivate, setIsPrivate] = useState(defaultPrivate)
   const [visibleToDoctor, setVisibleToDoctor] = useState(true)
   const [feelingScore, setFeelingScore] = useState(3)
   const [notes, setNotes] = useState('')
+  const [capturedImage, setCapturedImage] = useState('')
 
-  const feelingLabels = ['很差', '较差', '一般', '良好', '很好']
+  useEffect(() => {
+    setIsPrivate(defaultPrivate)
+  }, [defaultPrivate])
+
+  const handleChooseImage = async () => {
+    try {
+      const res = await Taro.chooseImage({
+        count: 1,
+        sourceType: ['album', 'camera'],
+        sizeType: ['compressed']
+      })
+      if (res.tempFilePaths && res.tempFilePaths.length > 0) {
+        setCapturedImage(res.tempFilePaths[0])
+        console.info('[Checkin] image chosen:', res.tempFilePaths[0])
+      }
+    } catch (err) {
+      console.error('[Checkin] chooseImage failed:', err)
+    }
+  }
+
+  const handleRetake = (e) => {
+    e.stopPropagation()
+    setCapturedImage('')
+  }
 
   const handleSubmit = () => {
     if (!selectedTreatment) {
       Taro.showToast({ title: '请选择疗程', icon: 'none' })
       return
     }
-    console.info('[Checkin] submit', { selectedTemplate, selectedTreatment, isPrivate, visibleToDoctor, feelingScore, notes })
+    if (!capturedImage) {
+      Taro.showToast({ title: '请先拍摄或选择照片', icon: 'none' })
+      return
+    }
+    const tpl = angleTemplates.find(t => t.id === selectedTemplate)
+    const treatment = treatments.find(t => t.id === selectedTreatment)
+    const pad = (n: number) => String(n).padStart(2, '0')
+    const now = new Date()
+    const date = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`
+
+    addPhoto({
+      treatmentId: selectedTreatment,
+      treatmentName: treatment?.name || '',
+      date,
+      imageUrl: capturedImage,
+      angle: tpl?.name || '',
+      isPrivate,
+      visibleToDoctor,
+      notes,
+      feeling: feelingLabels[feelingScore - 1],
+      feelingScore
+    })
+
     Taro.showToast({ title: '打卡成功', icon: 'success' })
+
+    setNotes('')
+    setFeelingScore(3)
+    setCapturedImage('')
+    setIsPrivate(defaultPrivate)
+
+    setTimeout(() => {
+      Taro.switchTab({ url: '/pages/compare/index' })
+    }, 800)
   }
 
   return (
@@ -69,12 +129,26 @@ const CheckinPage = () => {
       </View>
 
       <View className={styles.captureArea}>
-        <View className={styles.capturePreview}>
-          <View className={styles.capturePlaceholder}>
-            <Text className={styles.captureIcon}>📷</Text>
-          </View>
-          <Text className={styles.captureHint}>点击拍摄恢复照</Text>
-          <Text className={styles.captureTip}>按照角度模板拍摄，效果更佳</Text>
+        <View className={styles.capturePreview} onClick={handleChooseImage}>
+          {capturedImage ? (
+            <>
+              <View className={styles.captureImageWrap}>
+                <Image className={styles.captureImage} src={capturedImage} mode='aspectFill' />
+                <View className={styles.captureRetake} onClick={handleRetake}>
+                  <Text className={styles.captureRetakeText}>重新选择</Text>
+                </View>
+              </View>
+              <Text className={styles.captureTip}>点击可重新选择照片</Text>
+            </>
+          ) : (
+            <>
+              <View className={styles.capturePlaceholder}>
+                <Text className={styles.captureIcon}>📷</Text>
+              </View>
+              <Text className={styles.captureHint}>点击拍摄或选择恢复照</Text>
+              <Text className={styles.captureTip}>按照角度模板拍摄，效果更佳</Text>
+            </>
+          )}
         </View>
       </View>
 

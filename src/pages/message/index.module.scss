@@ -143,11 +143,13 @@
 }
 
 .modalContent {
-  width: 600rpx;
+  width: 640rpx;
+  max-height: 80vh;
   background: $color-bg-card;
   border-radius: $radius-xl;
-  padding: $spacing-xl;
+  padding: $spacing-lg;
   box-shadow: $shadow-popup;
+  overflow-y: auto;
 }
 
 .modalTitle {
@@ -158,9 +160,46 @@
   margin-bottom: $spacing-lg;
 }
 
+.modalSection {
+  margin-bottom: $spacing-md;
+}
+
+.modalLabel {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-bottom: $spacing-sm;
+}
+
+.treatmentOptions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+}
+
+.treatmentOption {
+  padding: 8rpx 20rpx;
+  border-radius: $radius-round;
+  background: $color-bg-hover;
+  transition: all $transition-base;
+
+  &.selected {
+    background: $color-primary;
+  }
+}
+
+.treatmentOptionText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+
+  .selected & {
+    color: #ffffff;
+  }
+}
+
 .modalInput {
   width: 100%;
-  min-height: 160rpx;
+  min-height: 200rpx;
   background: $color-bg-hover;
   border-radius: $radius-md;
   padding: $spacing-md;
@@ -168,12 +207,13 @@
   color: $color-text-primary;
   line-height: $line-height-loose;
   box-sizing: border-box;
-  margin-bottom: $spacing-lg;
+  border: none;
 }
 
 .modalActions {
   display: flex;
   gap: $spacing-md;
+  margin-top: $spacing-lg;
 }
 
 .modalBtn {
@@ -194,6 +234,10 @@
   &.confirm {
     background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
   }
+
+  &.confirmWarning {
+    background: linear-gradient(135deg, $color-error 0%, #F0A0A0 100%);
+  }
 }
 
 .modalBtnText {
@@ -205,7 +249,8 @@
     color: $color-text-secondary;
   }
 
-  .confirm & {
+  .confirm &,
+  .confirmWarning & {
     color: #ffffff;
   }
 }

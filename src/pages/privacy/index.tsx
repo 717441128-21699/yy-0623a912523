@@ -1,21 +1,21 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { View, Text, ScrollView, Image } from '@tarojs/components'
-import { photos } from '@/data/photos'
+import { useAppStore } from '@/store/index'
 import styles from './index.module.scss'
 import classnames from 'classnames'
 
 const PrivacyPage = () => {
-  const [defaultPrivate, setDefaultPrivate] = useState(false)
-  const [shareAuth, setShareAuth] = useState(true)
-  const [doctorVisible, setDoctorVisible] = useState(true)
-  const [photoPrivacyMap, setPhotoPrivacyMap] = useState<Record<string, boolean>>(() => {
-    const map: Record<string, boolean> = {}
-    photos.forEach(p => { map[p.id] = p.isPrivate })
-    return map
-  })
+  const photos = useAppStore(s => s.photos)
+  const defaultPrivate = useAppStore(s => s.defaultPrivate)
+  const shareAuth = useAppStore(s => s.shareAuth)
+  const doctorVisible = useAppStore(s => s.doctorVisible)
+  const setDefaultPrivate = useAppStore(s => s.setDefaultPrivate)
+  const setShareAuth = useAppStore(s => s.setShareAuth)
+  const setDoctorVisible = useAppStore(s => s.setDoctorVisible)
+  const setPhotoPrivate = useAppStore(s => s.setPhotoPrivate)
 
-  const togglePhotoPrivacy = (id: string) => {
-    setPhotoPrivacyMap(prev => ({ ...prev, [id]: !prev[id] }))
+  const togglePhotoPrivacy = (id: string, currentVal: boolean) => {
+    setPhotoPrivate(id, !currentVal)
   }
 
   return (
@@ -71,15 +71,15 @@ const PrivacyPage = () => {
         <Text className={styles.sectionTitle}>照片可见性管理</Text>
         <View className={styles.photoList}>
           {photos.map(photo => (
-            <View key={photo.id} className={styles.photoItem} onClick={() => togglePhotoPrivacy(photo.id)}>
+            <View key={photo.id} className={styles.photoItem} onClick={() => togglePhotoPrivacy(photo.id, photo.isPrivate)}>
               <Image className={styles.photoThumb} src={photo.imageUrl} mode='aspectFill' />
               <View className={styles.photoInfo}>
                 <Text className={styles.photoDate}>{photo.date}</Text>
                 <Text className={styles.photoAngle}>{photo.treatmentName} · {photo.angle}</Text>
               </View>
-              <View className={classnames(styles.photoPrivacy, photoPrivacyMap[photo.id] ? styles.private : styles.public)}>
+              <View className={classnames(styles.photoPrivacy, photo.isPrivate ? styles.private : styles.public)}>
                 <Text className={styles.photoPrivacyText}>
-                  {photoPrivacyMap[photo.id] ? '仅自己可见' : '可查看'}
+                  {photo.isPrivate ? '仅自己可见' : '可查看'}
                 </Text>
               </View>
             </View>
@@ -98,7 +98,7 @@ const PrivacyPage = () => {
             </View>
             <View className={styles.shareRule}>
               <View className={styles.shareRuleDot} />
-              <Text className={styles.shareRuleText}>标记为"仅自己可见"的照片不会出现在分享图中</Text>
+              <Text className={styles.shareRuleText}>标记为"仅自己可见"的照片不会出现在分享图中，医生端也看不到</Text>
             </View>
             <View className={styles.shareRule}>
               <View className={styles.shareRuleDot} />

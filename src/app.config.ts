@@ -9,7 +9,8 @@ export default defineAppConfig({
     'pages/compareDetail/index',
     'pages/reminder/index',
     'pages/message/index',
-    'pages/privacy/index'
+    'pages/privacy/index',
+    'pages/sharePreview/index'
   ],
   window: {
     backgroundTextStyle: 'light',

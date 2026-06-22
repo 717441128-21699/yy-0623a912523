@@ -1,0 +1,296 @@
+@use '@/styles/variables.scss' as *;
+
+.page {
+  min-height: 100vh;
+  background: $color-bg-page;
+  padding-bottom: 200rpx;
+}
+
+.previewCard {
+  margin: $spacing-lg $page-padding $spacing-md;
+  background: linear-gradient(180deg, #FFF8FB 0%, #FFFFFF 100%);
+  border-radius: $radius-xl;
+  padding: $spacing-lg;
+  box-shadow: 0 8rpx 32rpx rgba(212, 160, 184, 0.18);
+  overflow: hidden;
+  position: relative;
+}
+
+.previewHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.previewTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+}
+
+.previewLogo {
+  font-size: $font-size-md;
+  color: $color-primary-dark;
+  font-weight: $font-weight-semibold;
+}
+
+.previewSubTitle {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-md;
+}
+
+.compareRow {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-md;
+}
+
+.compareImgWrap {
+  flex: 1;
+  position: relative;
+  border-radius: $radius-lg;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.06);
+}
+
+.compareImg {
+  width: 100%;
+  height: 300rpx;
+}
+
+.compareImgLabel {
+  position: absolute;
+  top: $spacing-xs;
+  left: $spacing-xs;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-round;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.compareImgLabel.before {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.compareImgLabel.after {
+  background: rgba(212, 160, 184, 0.9);
+}
+
+.compareImgLabelText {
+  font-size: $font-size-xs;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.compareImgDate {
+  position: absolute;
+  bottom: $spacing-xs;
+  right: $spacing-xs;
+  padding: 2rpx 10rpx;
+  border-radius: $radius-round;
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.compareImgDateText {
+  font-size: 20rpx;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.summarySection {
+  background: rgba(212, 160, 184, 0.08);
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.summaryTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-primary-dark;
+  margin-bottom: $spacing-sm;
+}
+
+.summaryItem {
+  display: flex;
+  align-items: flex-start;
+  padding: 4rpx 0;
+}
+
+.summaryDot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: $radius-round;
+  background: $color-primary;
+  margin-right: $spacing-sm;
+  margin-top: 12rpx;
+  flex-shrink: 0;
+}
+
+.summaryText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+  flex: 1;
+}
+
+.timelineMini {
+  margin-top: $spacing-sm;
+}
+
+.timelineMiniTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-sm;
+}
+
+.timelineThumbs {
+  display: flex;
+  gap: $spacing-xs;
+  overflow-x: auto;
+  padding-bottom: $spacing-xs;
+}
+
+.timelineThumb {
+  flex-shrink: 0;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: $radius-sm;
+  position: relative;
+  overflow: hidden;
+}
+
+.timelineThumbImg {
+  width: 100%;
+  height: 100%;
+}
+
+.timelineThumbDate {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 2rpx 0;
+  text-align: center;
+}
+
+.timelineThumbDateText {
+  font-size: 18rpx;
+  color: #ffffff;
+}
+
+.privacyHint {
+  background: rgba(155, 139, 152, 0.08);
+  border-radius: $radius-md;
+  padding: $spacing-sm $spacing-md;
+  margin-bottom: $spacing-sm;
+  display: flex;
+  align-items: center;
+}
+
+.privacyIcon {
+  font-size: 28rpx;
+  margin-right: $spacing-sm;
+}
+
+.privacyText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  line-height: $line-height-loose;
+  flex: 1;
+}
+
+.footerBrand {
+  text-align: center;
+  padding-top: $spacing-md;
+  border-top: 1rpx dashed $color-border;
+}
+
+.footerBrandText {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.footerBrandSub {
+  font-size: 20rpx;
+  color: $color-text-disabled;
+  margin-top: 4rpx;
+}
+
+.bottomBar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: $color-bg-card;
+  padding: $spacing-md $page-padding;
+  box-shadow: 0 -2rpx 12rpx rgba(0, 0, 0, 0.06);
+  z-index: 100;
+  display: flex;
+  gap: $spacing-sm;
+}
+
+.actionBtn {
+  flex: 1;
+  height: $button-height-lg;
+  border-radius: $radius-button;
+  @include flex-center;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.9;
+    transform: scale(0.98);
+  }
+
+  &.ghost {
+    background: $color-bg-hover;
+    .actionBtnText {
+      color: $color-text-secondary;
+    }
+  }
+
+  &.primary {
+    background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+    .actionBtnText {
+      color: #ffffff;
+    }
+  }
+}
+
+.actionBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  white-space: nowrap;
+}
+
+.emptyCard {
+  margin: $spacing-xl $page-padding;
+  background: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-xl $spacing-lg;
+  box-shadow: $shadow-card;
+  @include flex-center;
+  flex-direction: column;
+}
+
+.emptyIcon {
+  font-size: 80rpx;
+  margin-bottom: $spacing-md;
+}
+
+.emptyTitle {
+  font-size: $font-size-lg;
+  color: $color-text-primary;
+  font-weight: $font-weight-semibold;
+  margin-bottom: $spacing-xs;
+}
+
+.emptyDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  text-align: center;
+  line-height: $line-height-loose;
+}

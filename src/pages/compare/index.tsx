@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from 'react'
 import { View, Text, ScrollView } from '@tarojs/components'
-import { photos } from '@/data/photos'
 import { treatments } from '@/data/treatments'
+import { useAppStore } from '@/store/index'
 import CompareSlider from '@/components/CompareSlider'
 import PhotoTimeline from '@/components/PhotoTimeline'
 import styles from './index.module.scss'
@@ -9,7 +9,10 @@ import classnames from 'classnames'
 import Taro from '@tarojs/taro'
 
 const ComparePage = () => {
-  const treatmentIds = [...new Set(photos.map(p => p.treatmentId))]
+  const photos = useAppStore(s => s.photos)
+  const shareAuth = useAppStore(s => s.shareAuth)
+
+  const treatmentIds = useMemo(() => [...new Set(photos.map(p => p.treatmentId))], [photos])
   const treatmentOptions = treatments.filter(t => treatmentIds.includes(t.id))
   const [selectedTreatment, setSelectedTreatment] = useState(treatmentOptions[0]?.id || '')
 
@@ -17,7 +20,7 @@ const ComparePage = () => {
     return photos
       .filter(p => p.treatmentId === selectedTreatment)
       .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-  }, [selectedTreatment])
+  }, [selectedTreatment, photos])
 
   const comparePair = useMemo(() => {
     if (treatmentPhotos.length < 2) return null
@@ -28,18 +31,22 @@ const ComparePage = () => {
   }, [treatmentPhotos])
 
   const handleShare = () => {
-    Taro.showModal({
-      title: '隐私授权确认',
-      content: '生成分享图前，请确认您同意将照片用于分享。系统将仅展示您同意公开的照片，私密照片不会被包含。',
-      confirmText: '同意生成',
-      cancelText: '取消',
-      success: (res) => {
-        if (res.confirm) {
-          console.info('[Compare] share authorized')
-          Taro.showToast({ title: '分享图已生成', icon: 'success' })
+    if (!shareAuth) {
+      Taro.showModal({
+        title: '隐私授权确认',
+        content: '生成分享图前，请确认您同意将照片用于分享。系统将仅展示您同意公开的照片，私密照片不会被包含。',
+        confirmText: '同意生成',
+        cancelText: '取消',
+        success: (res) => {
+          if (res.confirm) {
+            console.info('[Compare] share authorized')
+            Taro.navigateTo({ url: `/pages/sharePreview/index?treatmentId=${selectedTreatment}` })
+          }
         }
-      }
-    })
+      })
+      return
+    }
+    Taro.navigateTo({ url: `/pages/sharePreview/index?treatmentId=${selectedTreatment}` })
   }
 
   return (
@@ -85,6 +92,14 @@ const ComparePage = () => {
               <View className={styles.summaryDot} />
               <Text className={styles.summaryText}>最新感受：{comparePair.after.feeling}</Text>
             </View>
+            {treatmentPhotos.some(p => p.isPrivate) && (
+              <View className={styles.summaryItem}>
+                <View className={styles.summaryDot} />
+                <Text className={styles.summaryText}>
+                  其中 {treatmentPhotos.filter(p => p.isPrivate).length} 张设为私密，分享时不会显示
+                </Text>
+              </View>
+            )}
           </View>
         </View>
       )}
